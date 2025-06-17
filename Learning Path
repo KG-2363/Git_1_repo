@@ -1,6 +1,24 @@
 Learning Repo for Data Engineering Journey
-SQL 
-PySpark
-GCP
-Python 
-DSA & Algorithms
+
+# Based on EPAM Interview
+SQL - Joining with nulls, Anti Joins, Full Join, Outer and Inner Joins
+File formats - Types of File Formats, Details about Parquet Format, compression
+PySpark - Lazy Evaluation, AQE, Predicate Pushdown, Partition Pruning, Process then filter or filter them process, Cache & Persist (Default),
+Which is faster, How the data gets shuffled during joining tables, 
+Code - PySpark code to Find the data in one table which is not in second table
+GCP - Services Used, Storage Class in GCS
+Python - Tuple & List, Decorator, Multithreading, Two Sum Problem
+DSA & Algorithms - MD5,
+GitHub - Merge conflicts Handling
+
+What are the data validation rules that you will apply on the incoming data? How will you handle inconsistemt data?
+
+# Based on Fossil Interview
+BigQuery - Shallow, clone, snapshot, Views , objects in BQ
+PySpark - 4th highest salary using PySpark
+
+# Based on IBM Interview 
+SQL- Find highest salary in each department
+Python - The output should be A1, B2, C3, D4
+
+
