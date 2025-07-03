@@ -3,10 +3,10 @@ Learning Repo for Data Engineering Journey
 # Based on EPAM Interview
 SQL - Joining with nulls, Anti Joins, Full Join, Outer and Inner Joins
 File formats - Types of File Formats, Details about Parquet Format, compression
-PySpark - Lazy Evaluation, AQE, Predicate Pushdown, Partition Pruning, Process then filter or filter them process, Cache & Persist (Default),
-Which is faster, How the data gets shuffled during joining tables, 
+PySpark - Lazy Evaluation, AQE, Predicate Pushdown, Partition Pruning, Process then filter or filter them process, Cache & Persist (Default), GroupByKey & ReduceByKey diff
+Which is faster, How the data gets shuffled during joining tables, no of default shuffles during join
 Code - PySpark code to Find the data in one table which is not in second table
-GCP - Services Used, Storage Class in GCS
+GCP - Services Used, Storage Class in GCS, How the policy is applied on a bucket
 Python - Tuple & List, Decorator, Multithreading, Two Sum Problem
 DSA & Algorithms - MD5,
 GitHub - Merge conflicts Handling
