@@ -1,0 +1,30 @@
+# Cloud Bigtable -
+It is a serverless, no sql, wide column database service by GCP, scales upto petabytes
+Good for time series data like sensors etc
+cbt and hbase api are used to connect with it
+sensorid + timestamp is a good choice for rowkey. Only timestamps may create hotspotting, salting can also be used for it
+
+# commands 
+cbt ls - show tables
+cbt ls table_name - shows tha column family names
+cbt read emp - to show the table data
+# We can create column families from GUI based as well
+# commands to insert data 
+cbt set emp J1 personal_data_cf:name = John
+cbt set emp J1 personal_data_cf:age = 28
+cbt set emp A1 professional_data_cf:salary = 20000
+cbt set emp J1 professional_data_cf:salary = 32000
+# commands to update data 
+cbt set emp J1 professional_data_cf:salary = 35000
+# Note - It stores both versions of the data
+Example -
+cbt read emp 
+ J1
+ personal_data_cf:name = John
+ personal_data_cf:age = 28
+ professional_data_cf:salary = 32000
+ professional_data_cf:salary = 35000
+# 
+
+
+
