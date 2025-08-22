@@ -1,1 +1,170 @@
-PySpark
+PySpark --
+
+import pyspark
+from pyspark.sql import SparkSession
+spark = SparkSession.builder.appName('pyspark-by-examples').getOrCreate()
+
+
+arrayData = [
+        ('James',['Java','Scala'],{'hair':'black','eye':'brown'}),
+        ('Michael',['Spark','Java',None],{'hair':'brown','eye':None}),
+        ('Robert',['CSharp',''],{'hair':'red','eye':''}),
+        ('Washington',None,None),
+        ('Jefferson',['1','2'],{}) ]
+
+df = spark.createDataFrame(data=arrayData, schema = ['name','knownLanguages','properties'])
+df.printSchema()
+df.show()
+
+
+%md
+PySpark function explode(e: Column) is used to explode or create array or map columns to rows.
+When an array is passed to this function, it creates a new default column “col1” and it contains all array elements. 
+When a map is passed, it creates two new columns one for key and one for value and each element in map split into the rows.
+This will ignore elements that have null or empty. from the above example, Washington and Jefferson have null or empty values in array and map, 
+hence the following snippet out does not contain these rows.
+
+from pyspark.sql.functions import explode
+df2 = df.select(df.name,explode(df.knownLanguages))
+df2.printSchema()
+df2.show()
+root
+ |-- name: string (nullable = true)
+ |-- key: string (nullable = false)
+ |-- value: string (nullable = true)
+
++-------+----+-----+
+|   name| key|value|
++-------+----+-----+
+|  James|hair|black|
+|  James| eye|brown|
+|Michael|hair|brown|
+|Michael| eye| NULL|
+| Robert|hair|  red|
+| Robert| eye|     |
++-------+----+-----+
+
+
+
+df3 = df.select(df.name,explode(df.properties))
+df3.printSchema()
+df3.show()
+root
+ |-- name: string (nullable = true)
+ |-- key: string (nullable = false)
+ |-- value: string (nullable = true)
+
++-------+----+-----+
+|   name| key|value|
++-------+----+-----+
+|  James|hair|black|
+|  James| eye|brown|
+|Michael|hair|brown|
+|Michael| eye| NULL|
+| Robert|hair|  red|
+| Robert| eye|     |
++-------+----+-----+
+
+df4 = df.select(df.name,explode(df.knownLanguages),explode(df.properties))
+df4.printSchema()
+df4.show()
+
+root
+ |-- name: string (nullable = true)
+ |-- col: string (nullable = true)
+ |-- key: string (nullable = false)
+ |-- value: string (nullable = true)
+
++-------+------+----+-----+
+|   name|   col| key|value|
++-------+------+----+-----+
+|  James|  Java|hair|black|
+|  James|  Java| eye|brown|
+|  James| Scala|hair|black|
+|  James| Scala| eye|brown|
+|Michael| Spark|hair|brown|
+|Michael| Spark| eye| NULL|
+|Michael|  Java|hair|brown|
+|Michael|  Java| eye| NULL|
+|Michael|  NULL|hair|brown|
+|Michael|  NULL| eye| NULL|
+| Robert|CSharp|hair|  red|
+| Robert|CSharp| eye|     |
+| Robert|      |hair|  red|
+| Robert|      | eye|     |
++-------+------+----+-----+
+
+
+Collect_List
+
+simpleData = [("James", "Sales", 3000),
+    ("Michael", "Sales", 4600),
+    ("Robert", "Sales", 4100),
+    ("Maria", "Finance", 3000),
+    ("James", "Sales", 3000),
+    ("Scott", "Finance", 3300),
+    ("Jen", "Finance", 3900),
+    ("Jeff", "Marketing", 3000),
+    ("Kumar", "Marketing", 2000),
+    ("Saif", "Sales", 4100)
+  ]
+schema = ["employee_name", "department", "salary"]
+df = spark.createDataFrame(data=simpleData, schema = schema)
+df.printSchema()
+df.show(truncate=False)
+
+
+root
+ |-- employee_name: string (nullable = true)
+ |-- department: string (nullable = true)
+ |-- salary: long (nullable = true)
+
++-------------+----------+------+
+|employee_name|department|salary|
++-------------+----------+------+
+|James        |Sales     |3000  |
+|Michael      |Sales     |4600  |
+|Robert       |Sales     |4100  |
+|Maria        |Finance   |3000  |
+|James        |Sales     |3000  |
+|Scott        |Finance   |3300  |
+|Jen          |Finance   |3900  |
+|Jeff         |Marketing |3000  |
+|Kumar        |Marketing |2000  |
+|Saif         |Sales     |4100  |
++-------------+----------+------+
+
+from pyspark.sql.functions import collect_list,collect_set
+
+df.select(collect_list("salary")).show(truncate=False)
+df.show()
+
+------------------------------------------------------------+
+|collect_list(salary)                                        |
++------------------------------------------------------------+
+|[3000, 4600, 4100, 3000, 3000, 3300, 3900, 3000, 2000, 4100]|
++------------------------------------------------------------+
+
++-------------+----------+------+
+|employee_name|department|salary|
++-------------+----------+------+
+|        James|     Sales|  3000|
+|      Michael|     Sales|  4600|
+|       Robert|     Sales|  4100|
+|        Maria|   Finance|  3000|
+|        James|     Sales|  3000|
+|        Scott|   Finance|  3300|
+|          Jen|   Finance|  3900|
+|         Jeff| Marketing|  3000|
+|        Kumar| Marketing|  2000|
+|         Saif|     Sales|  4100|
++-------------+----------+------+
+
+df.select(collect_set("salary")).show(truncate=False)
++------------------------------------+
+|collect_set(salary)                 |
++------------------------------------+
+|[4600, 3000, 3900, 4100, 3300, 2000]|
++------------------------------------+
+
+
