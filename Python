@@ -1,20 +1,92 @@
 Python --
 
+==================================================
+## LIST 
+Accessing elements of a List #
+
+# Use Case	              # Method
+Access a specific item	  list[index]
+Loop through all items	  for item in list:
+Need index and value	  for i, item in enumerate(list):
+Filter items	          Use if inside loop
+
+fruits = ['apple', 'banana', 'cherry']
+print(fruits[0])  # Output: apple
+print(fruits[2])  # Output: cherry
+
+for fruit in fruits:
+    if 'a' in fruit:
+        print(fruit)
+
+for i, fruit in enumerate(fruits):
+    print(f"Index {i}: {fruit}")
+ # Output: apple
+ # Output: banana
+
+for i in range(len(fruits)):
+    print(f"Index {i}: {fruits[i]}")
+
+==================================================
+## TUPLES 
+
+marks = (85, 90, 85, 92, 85)
+
+count = 0
+for mark in marks:
+    if mark == 85:
+        count +=1
+print(count)
+
+
+==================================================
+## DICTIONARY 
+
+students = [
+    {'name': 'Ravi', 'marks': 85},
+    {'name': 'Anita', 'marks': 92},
+    {'name': 'Kumar', 'marks': 78}
+]
+
+names = []
+count = 0
+
+# get method
+
+for student in students:
+    if student.get('marks') > 80:
+       names.append(student.get('name'))
+       count += 1
+print(set(names))
+print(count)
+
+# Items method 
+
+student1 = {'name': 'Ravi', 'age': 21, 'grade': 'A'}
+student1_list = student1.items()
+print(student1_list)
+
+# isinstance method
+for k,v in student1.items():
+    print(f"{ k } : { v }")
+    if isinstance(v, str):
+        print(v)
+
+==================================================
+
+list_nums = [12,12,34,55,67,88,89,85]
+list_rev=[]
+
+# Reverse List elements
 
 def rev_list(nums):
-    list_rev=[]
-    for i in nums:
+    for i in range(len(nums)):
         list_rev.append(nums[-i])
-    print(list_rev)   
-
 rev_list(list_nums)
-
-
+print(list_rev)
 
 def rev_list(nums):
   return nums[::-1]
 print(rev_list(list_nums))
-
 
 def even_sum(nums):
     even_nums=[]
@@ -26,13 +98,13 @@ def even_sum(nums):
 
 even_sum(list_nums)
 
-
 even_sum = lambda nums: sum(num for num in nums if num % 2 == 0)
 even_sum(list_nums)
 
-
 len_list = len(list_nums_1)
 
+==================================================
+# Remove duplicates from a list
 def remove_dup(nums):
     i=0
     while i < len_list-1:
@@ -43,6 +115,7 @@ def remove_dup(nums):
     return list_nums_1
 remove_dup(list_nums_1)
 
+==================================================
 
 def squared_nums(nums):
     squared_nums=[]
@@ -51,7 +124,7 @@ def squared_nums(nums):
     return squared_nums
 squared_nums(list_nums_1)
 
-
+==================================================
 list_1 = [1,2,3,4,5,6,7,8,9,10]
 k=2
 # Break the list in 2 parts at kth elements from last and then merge the list
@@ -66,6 +139,7 @@ def rotate_list(nums,k):
     return nums[len(nums)-k:] + nums[:len(nums)-k]
 rotate_list(list_1,k)
 
+==================================================
 
 #Count the number of vowels in a given string.
 word = 'AnkitaRiya'
@@ -78,6 +152,7 @@ def count_vowels(word):
     return count
 count_vowels(word)
 
+==================================================
 
 #Reverse the string without using slicing.
 def reverse_string(word1,word2):
@@ -91,6 +166,7 @@ def reverse_string(word1,word2):
 
 reverse_string(word,word)
 
+==================================================
 
 #Write a function to find the first non-repeating character in a string. If all characters repeat, return None.
 def first_non_repeating_character(string):
@@ -110,330 +186,8 @@ def first_non_repeating_character(string):
 first_non_repeating_character(word)
 
 
+========================================================================================================================================================================================================
 
-
-
-
-class Student():
-    def __init__(self, name, age):
-        self.name = name
-        self.age = age
-s1= Student("Karan", 25)
-print(s1.name)
-print(s1.age)
-
-
-class Student():
-    def __init__(self, name, maths_marks, science_marks, english_marks):
-        self.name = name
-        self.maths_marks = maths_marks
-        self.science_marks = science_marks
-        self.english_marks = english_marks
-    def avg_marks(self):
-        return (self.maths_marks + self.science_marks + self.english_marks)/3
-s1= Student("Karan", 98, 99, 100)
-s2= Student("Govind", 95, 89, 92)
-
-def students_marks_report():
-    students = [s1,s2]
-    for i in range(len(students)):
-        print(f" Name of Student {students[i].name} and Average Marks {students[i].avg_marks()}")
-
-
-import pandas as pd
-
-data = {
-    'name': ['Karan', 'Govind'],
-    'maths_marks': [98, 95],
-    'science_marks': [99, 89],
-    'english_marks': [100, 92]
-}
-students_df = pd.DataFrame(data)
-display(students_df)
-
-def students_marks_report():
-    students = [s1,s2]
-    for i in range(len(students)):
-        print(f" Name of Student {students[i].name} and Average Marks {students[i].avg_marks()}")
-
-
-def account():
-   def __init__(self, account_no, balance):
-       self.account_no = account_no
-       self.balance = balance
-
-   def deposit(self, amount):
-       self.balance += amount
-
-   def withdraw(self, amount):
-       if self.balance >= amount:
-           self.balance -= amount
-       else:
-           print("Insufficient balance")
-           
-   def get_balance(self):
-       return self.balance
-account_no = 1234567890
-balance = 1000
-account = Account(account_no, balance)
-account.deposit(500)
-account.withdraw(200)
-balance = account.get_balance()
-print(f"Account balance: {balance}")
-
-
-
-class Circle:
-    def __init__(self, radius):
-        self.radius = radius
-
-    def area(self):
-        return 3.14 * self.radius ** 2
-
-    def perimeter(self):
-        return 2 * 3.14 * self.radius
-circle = Circle(5)
-print(circle.area())
-print(circle.perimeter())
-
-class Employee:
-    def __init__(self,role,dept,salary):
-        self.role = role
-        self.dept = dept
-        self.salary = salary
-
-    def showDetails(self):
-        print(f"Employee role is {self.role} and department is {self.dept} and salary is {self.salary}")
-
-class Engineer(Employee):
-    def __init__(self, name,age):
-        self.name = name 
-        self.age = age
-        super().__init__("Engineer","IT",75000)
-        print("Engineer class constructor")
-        
-
-engg1 = Engineer("Karan", 24)
-print( engg1.name, engg1.age, engg1.role, engg1.dept, engg1.salary)
-engg1.showDetails()
-
-
-class Order:
-    def __init__(self,item,price):
-        self.item=item
-        self.price=price
-
-    def __gt__(self,other):
-        return self.price>other.price
-order1=Order("Laptop",1000)
-order2=Order("Mobile",500)
-print(order1>order2)    
-
-
-class Node:
-    def __init__(self, data = None, next = None):
-        self.data = data
-        self.next = next
-
-class LinkedList:
-    def __init__(self):
-        self.head = None
-
-    def print(self):
-        if self.head is None:
-            print("Linked list is empty")
-            return
-        itr = self.head
-        llstr = ''
-        while itr:
-            llstr += str(itr.data)+' --> ' if itr.next else str(itr.data)
-            itr = itr.next
-        print(llstr)
-
-    def insert_at_beginning(self, data):
-        node = Node(data, self.head)
-        self.head = node
-    def insert_at_end(self, data):
-        if self.head is None:
-            self.head = Node(data, None)
-            return
-        itr = self.head
-        while itr.next:
-            itr = itr.next
-
-        itr.next = Node(data, None)
-
-    def insert_values(self, data_list):
-        self.head = None
-        for data in data_list:
-            self.insert_at_end(data)
-    def get_length(self):
-        count = 0
-        itr = self.head
-        while itr:
-            count+=1
-            itr = itr.next
-
-        return count
-
-    def remove_at(self, index):
-        if index<0 or index>=self.get_length():
-            raise Exception("Invalid Index")    
-        if index==0:
-            self.head = self.head.next
-            return
-
-        count = 0
-        itr = self.head
-        while itr:       
-            if count == index - 1:
-                itr.next = itr.next.next
-                break   
-            itr = itr.next
-            count+=1
-
-    def insert_at(self, index, data):
-        if index<0 or index>self.get_length():
-            raise Exception("Invalid Index")
-
-        if index==0:
-            self.insert_at_beginning(data)
-            return
-
-        count = 0        
-        itr = self.head
-        while itr:
-            if count == index - 1:
-                node = Node(data, itr.next)
-                itr.next = node
-                break
-
-            itr = itr.next
-            count+=1
-
-    def insert_after_value(self, data_after, data_to_insert):
-        if self.head is None:
-            return
-
-        if self.head.data==data_after:
-            self.head.next = Node(data_to_insert,self.head.next)
-            return
-
-        itr = self.head
-        while itr:
-            if itr.data == data_after:
-                itr.next = Node(data_to_insert,itr.next)
-                break
-
-            itr = itr.next
-
-    def remove_by_value(self, data):
-        if self.head is None:
-            return
-
-        if self.head.data==data:
-            self.head = self.head.next
-            return
-
-        itr = self.head
-        while itr.next:
-            if itr.next.data == data:
-                itr.next = itr.next.next
-                break
-            itr = itr.next
-    def __repr__(self):
-        if self.head is None:
-            return "Linked list is empty"
-        itr = self.head
-        llstr = ''
-        while itr:
-            llstr += str(itr.data)+' --> ' if itr.next else str(itr.data)
-            itr = itr.next
-        return llstr    
-    def reverse(self):
-        prev = None
-        current = self.head
-        while(current is not None):
-            next = current.next
-            current.next = prev
-            prev = current
-            current = next
-        self.head = prev
-ll = LinkedList()
-ll.insert_values(["banana","mango","grapes","orange"])
-ll.reverse()
-print(ll)
-
-
-
-ll.remove_by_value("mango")
-print(ll)
-
-
-ll.insert_after_value("banana","figs")
-ll.print()
-
-
-class TreeNode:
-  def __init__(self, data):
-    self.data = data
-    self.children = []
-    self.parent = None
-
-  def add_child(self, child):
-    child.parent = self
-    self.children.append(child)
-
-  def get_level(self):
-    level = 0
-    p = self.parent
-    while p:
-      level += 1
-      p = p.parent
-
-    return level
-
-  def print_tree(self):
-    spaces = ' ' * self.get_level() * 3
-    prefix = spaces + "|__" if self.parent else ""
-    print(prefix + self.data)
-    if self.children:
-      for child in self.children:
-        child.print_tree()
-
-  def build_product_tree():
-    root = TreeNode("Electronics")
-
-    laptop = TreeNode("Laptop")
-    laptop.add_child(TreeNode("Mac"))
-    laptop.add_child(TreeNode("Surface")) 
-
-    phone = TreeNode("Phone")
-    phone.add_child(TreeNode("iPhone"))
-    phone.add_child(TreeNode("Google Pixel"))
-
-    tv = TreeNode("TV")
-    tv.add_child(TreeNode("Samsung"))
-    tv.add_child(TreeNode("LG"))
-
-    root.add_child(laptop)
-    root.add_child(phone)
-    root.add_child(tv)
-
-    return root
-root = TreeNode.build_product_tree()
-root.print_tree()
-
-
-Electronics
-   |__Laptop
-      |__Mac
-      |__Surface
-   |__Phone
-      |__iPhone
-      |__Google Pixel
-   |__TV
-      |__Samsung
       |__LG
 
 
