@@ -10,6 +10,20 @@ Loop through all items	  for item in list:
 Need index and value	  for i, item in enumerate(list):
 Filter items	          Use if inside loop
 
+#Method	           #Description	                             #Example
+append(x)	       Adds an item to the end	                 fruits.append("orange")
+extend(iterable)   Adds all items from another list	         fruits.extend(["grape", "melon"])
+insert(i, x)	   Inserts item at index i	                 fruits.insert(1, "kiwi")
+remove(x)	       Removes first occurrence of x	         fruits.remove("banana")
+pop([i])	       Removes and returns item at index i       fruits.pop()
+                   (last if not given)	
+clear()	           Removes all items	                     fruits.clear()
+index(x)	       Returns index of first occurrence of x	 fruits.index("apple")
+count(x)	       Counts how many times x appears	         fruits.count("apple")
+sort()	           Sorts the list in place	                 fruits.sort()
+reverse()	       Reverses the list in place	             fruits.reverse()
+copy()	           Returns a shallow copy	                 new_list = fruits.copy()
+
 fruits = ['apple', 'banana', 'cherry']
 print(fruits[0])  # Output: apple
 print(fruits[2])  # Output: cherry
@@ -27,19 +41,59 @@ for i in range(len(fruits)):
     print(f"Index {i}: {fruits[i]}")
 
 ==================================================
-## TUPLES 
+## TUPLES -A tuple is an immutable, ordered collection of elements in Python. You define it using parentheses ().
+Tuples use less memory than lists and are slightly faster for iteration.
+#Feature	 #Tuple
+Mutable	    ❌ No
+Ordered	    ✅ Yes
+Methods	    count(), index()
+Use Cases	Fixed data, function returns, dictionary keys, memory efficiency
+
+#Operation	  #Example	          #Description
+Indexing	  t[0]	              Access element by position
+Slicing	      t[1:3]	          Get a sub-tuple
+Length	      len(t)	          Number of elements
+Membership	  2 in t	          Check if value exists
+Iteration	  for x in t:	      Loop through elements
+Nesting	      ((1, 2), (3, 4))    Tuples inside tuples
+
+1. count(value) : Returns the number of times a value appears.
+t = (1, 2, 2, 3)
+t.count(2)  # Output: 2
+2. index(value) : Returns the first index of the value.
+t.index(3)  # Output: 3
+
+print(t[0:2])  # Output: (1,2,2)
 
 marks = (85, 90, 85, 92, 85)
-
-count = 0
+1. print( marks.count(85))
+2.count = 0
 for mark in marks:
     if mark == 85:
         count +=1
 print(count)
 
+--Unpacking 
+def get_user():
+    return ("Govind", "Lead Data Engineer")
+name, role = get_user()
+
+
 
 ==================================================
 ## DICTIONARY 
+
+Method	                      Description	                                    Example
+get(key, default)	          Returns value for key, or default if not found	employee.get("name", "Unknown")
+keys()	                      Returns all keys	                                employee.keys()
+values()	                  Returns all values	                            employee.values()
+items()	                      Returns all key-value pairs as tuples	            employee.items()
+update(dict)	              Adds or updates key-value pairs	                employee.update({"location": "Bengaluru"})
+pop(key)	                  Removes key and returns its value	                employee.pop("role")
+popitem()	                  Removes and returns last inserted key-value pair	employee.popitem()
+clear()	                      Removes all items	                                employee.clear()
+setdefault(key, default)	  Sets value if key not present                  	employee.setdefault("team", "Data")
+copy()	                      Returns a shallow copy	                        new_emp = employee.copy()
 
 students = [
     {'name': 'Ravi', 'marks': 85},
@@ -64,12 +118,30 @@ print(count)
 student1 = {'name': 'Ravi', 'age': 21, 'grade': 'A'}
 student1_list = student1.items()
 print(student1_list)
-
-# isinstance method
 for k,v in student1.items():
     print(f"{ k } : { v }")
-    if isinstance(v, str):
-        print(v)
+
+# isinstance method -- checks the datatype 
+if isinstance(v, str):
+     print(v)
+
+cust_details = {
+    'name': 'hello',
+    'id': '123',
+    'address': [
+        {'street': 'abc', 'city': 'bangalore', 'state': 'ka'},
+        {'street': 'abc', 'city': 'mumbai', 'state': 'mh'}
+    ]
+}
+
+# Loop through the list of addresses
+for addr in cust_details['address']:
+    if addr['state'] == 'mh':
+        print(addr)
+
+
+
+
 
 ==================================================
 
@@ -77,7 +149,6 @@ list_nums = [12,12,34,55,67,88,89,85]
 list_rev=[]
 
 # Reverse List elements
-
 def rev_list(nums):
     for i in range(len(nums)):
         list_rev.append(nums[-i])
@@ -108,13 +179,13 @@ len_list = len(list_nums_1)
 def remove_dup(nums):
     i=0
     while i < len_list-1:
-        if list_nums_1[i]==list_nums_1[i+1]:
-            list_nums_1.remove(list_nums_1[i+1])
+        if list_nums[i]==list_nums[i+1]:
+            list_nums.remove(list_nums[i+1])
         else:
             i+=1
-    return list_nums_1
-remove_dup(list_nums_1)
+    return list_nums
 
+remove_dup(list_nums)
 ==================================================
 
 def squared_nums(nums):
@@ -155,6 +226,7 @@ count_vowels(word)
 ==================================================
 
 #Reverse the string without using slicing.
+word = 'AnkitaRiya'
 def reverse_string(word1,word2):
     reversed_string=""
     reversed_string1=""
@@ -188,7 +260,7 @@ first_non_repeating_character(word)
 
 ========================================================================================================================================================================================================
 
-      |__LG
+     
 
 
 
