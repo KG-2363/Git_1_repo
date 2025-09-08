@@ -1,3 +1,63 @@
-SQL Concepts 
+SQL Concepts --
+
+SQL Operations - FROM > JOIN > WHERE > GROUP BY > HAVING > SELECT > ORDER BY
+
+# Join with Ranking for top 3 highest salaries in dept --
+WITH ranked_employees as (
+select e.emp_id, e.emp_name, e.dept_id, d.name, e.salary,
+dense_rank() over (partition by e.dept_id order by e.salary) as rnk
+from employees e
+join department d 
+on e.dept_id=d.id )
+select emp_id, emp_name, dept_id, salary from ranked_employees
+where rnk <= 3;
+
+# Managers having at least 5 direct reports --
+select emp_name from employees where emp_id in (
+  select manager_id from employees group by manager_id having count(*) > 5 )
+
+# Delete duplicates from table --
+with duplicated_records as (
+select *, row_number() over ( order by emp_id ) as rnk from employees )
+
+DELETE from duplicated_records where rnk > 1
+
+# Last Person to fit in the Bus --
+WITH total_weight_by_turn as (
+select person_name, sum(weight) over (order by turn) as total_weight from queue )
+select person_name from total_weight_by_turn where total_weight <= 1000 order by total_weight DESC limit 1
+
+# Transactions count and amount if approved from transactions table grouped by month and country
+select date_format('trans_date' , '%Y-%M') as month,
+country,
+EXTRACT(YEAR from trans_date) as year,
+EXTRACT(MONTH from trans_date) as month,
+sum(case when status='approved' then 1 else 0 end) as approved_count,
+sum(amount) as total_trans_amount,
+sum(case when status="approved" then amount else 0 end) as approved_trans_amount
+from transactions 
+where EXTRACT(YEAR from trans_date) = 2024 
+group by year, month, country
+
+# 7 day moving average of daily sales revenue --
+select prod_id, date, revenue, avg(revenue) over (partition by prod_id order by date rows between 6 PRECEDING and CURRENT ROW)
+AS '7_days_moving_avg'
+from sales_data
+order by prod_id, date
+
+# Organisation Tree
+--Starts a recursive CTE named Org_chart. This allows the query to call itself to build hierarchical data.
+--Base case
+WITH RECURSIVE Org_chart as (
+select emp_id, emp_name, manager_id, 0 as level from emp where manager_id is null
+union all    --is used to keep duplicates
+--recursive part:
+select e.emp_id, e.emp_name, e.manager_id, oc.level + 1 from employees e join Orgchart oc on e.manager_id = oc.emp_id 
+)
+select * from Orgchart order by level, emp_id
+
+# 
+
+
 
 
