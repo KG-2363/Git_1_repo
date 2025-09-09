@@ -1,4 +1,39 @@
 Python --
+Basic functions in Python --
+1. Map - It takes a function and a list as an argument. It returns an iterator, not a list.
+You need to consume the iterator (e.g., with list(), for loop, etc.) to see the actual values.
+This design is intentional for performance and memory efficiency.
+
+An iterator in Python is an object that represents a stream of data. 
+You can loop through it, but it doesn't hold all the data in memory at once. Instead, it generates each item on demand.
+
+list1 = [1,2,3,4]
+a = map(lambda x: (x,1),list1)
+print(a) -- map object at a0xx
+print(list(a)) -- [ (1,1),(2,1)..]
+
+2. Split - The split() function in Python is used to divide a string into a list of substrings based on a specified delimiter.
+The output is a list.
+sentence = "A black browm fox jumps over a lazy dog"
+words = sentence.split()
+print(words)
+['A', 'black', 'browm', 'fox', 'jumps', 'over', 'a', 'lazy', 'dog']
+
+3. Reduce - The reduce takes a function and a list as an input and returns a condensed output.
+
+
+
+4. Filter -The filter() function in Python takes in a function and a list as arguments. 
+This offers an elegant way to filter out all the elements of a sequence "sequence", for which the function returns True.
+a = [1,2,3,4,5]
+even = filter(lambda x : x%2 ==0, a)
+print(list(even))
+[2,4]
+
+   
+
+
+
 
 ==================================================
 ## LIST 
@@ -259,6 +294,76 @@ first_non_repeating_character(word)
 
 
 ========================================================================================================================================================================================================
+
+dict1 = { 'key1' : 2000, 'key2' : 3000, 'key3' : 5000}
+dict2 = { 'key1' : 1000, 'key2' : 2000}
+
+
+def merge_dict(dict1,dict2):
+  result_dict = dict1.copy()
+  for k,v in dict2.items():
+    if k in result_dict:
+        result_dict[k] += v
+    else:
+        result_dict[k] = v
+  return result_dict
+a = merge_dict(dict1,dict2)
+
+--------------------------------------------------------------
+
+nums = [1,2,3,3,23,2,3,1]
+def remove_dups(nums):
+    set_nums = set(nums)
+    print(set_nums)
+remove_dups(nums)
+
+--------------------------------------------------------------
+
+If next number is same, add to the dict
+nums = [1,2,3,3,23,2,3,1]
+def remove_dups(nums):
+    new_list_dict = {}
+    for i in range(len(nums)-1):
+        count=0
+        if nums[i]==nums[i+1]:
+            count+=1
+            new_list_dict[nums[i]]=count
+    print(new_list_dict)
+remove_dups(nums)
+
+--------------------------------------------------------------
+
+def invert_dict(dict):
+    inv_dict={}
+    for k,v in dict.items():
+        inv_dict[v] = k
+    print(inv_dict)
+invert_dict(dict1)
+
+--------------------------------------------------------------
+
+sentence = "a a b b c c d d e f"
+list_words = sentence.split(" ")
+print(list_words)
+a = list(map(lambda x:(x,1),list_words))
+print(a)
+print("="*30)
+from functools import reduce
+result = reduce(
+    lambda acc, item: acc.update({item[0]: acc.get(item[0], 0) + item[1]}) or acc,
+    data,
+    {}
+)
+
+# Convert to list of tuples
+print(list(result.items()))
+
+---------------------------------------------------------------
+
+
+
+
+
 
      
 
