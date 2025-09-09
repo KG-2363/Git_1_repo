@@ -167,4 +167,24 @@ df.select(collect_set("salary")).show(truncate=False)
 |[4600, 3000, 3900, 4100, 3300, 2000]|
 +------------------------------------+
 
+----------------------------------------------------------------
+from pyspark import SparkContext
+
+sc = SparkContext()
+
+# Sample sentence
+sentence = "a black brown fox jumps over a lazy dog a black fox"
+
+# Step 1: Split sentence into words
+words = sc.parallelize(sentence.split())
+
+# Step 2: Map each word to (word, 1)
+word_pairs = words.map(lambda word: (word, 1))
+
+# Step 3: Reduce by key (word) to count occurrences
+word_counts = word_pairs.reduceByKey(lambda a, b: a + b)
+
+# Step 4: Collect the result
+print(word_counts.collect())
+----------------------------------------------------------------
 
