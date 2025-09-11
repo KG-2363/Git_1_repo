@@ -19,9 +19,12 @@ words = sentence.split()
 print(words)
 ['A', 'black', 'browm', 'fox', 'jumps', 'over', 'a', 'lazy', 'dog']
 
-3. Reduce - The reduce takes a function and a list as an input and returns a condensed output.
-
-
+3. Reduce - The reduce takes a function and a list as an input and returns a reduced output. 
+from functools import reduce
+list1 =[1,2,3,4]
+b= reduce(lambda x,y : x*y,list1)
+print(b) --24
+print(type(b)) --class int
 
 4. Filter -The filter() function in Python takes in a function and a list as arguments. 
 This offers an elegant way to filter out all the elements of a sequence "sequence", for which the function returns True.
@@ -205,8 +208,71 @@ for key,value in dict2.items():
     else:
         result_dict[key]=value
 print(result_dict)
+
+# dict(...) converts this list of tuples into a dictionary. But if a key appears multiple times, only the last occurrence is kept.
+word = ['a','e','i','o','u','a','e','i','k']
+list_words = dict(map(lambda x: (x,1), word))
+print(list_words)
+output --{'a': 1, 'e': 1, 'i': 1, 'o': 1, 'u': 1, 'k': 1}
+So 'a' appears twice, but only the last ('a', 1) is retained. Same for 'e' and 'i'.
+
+# Counting the frequency of words in a list and return a dict with word,count --
+word = ['a','e','i','o','u','a','e','i','k']
+list_words = {}
+
+for char in word:
+    if char in list_words:
+        list_words[char] += 1
+    else:
+        list_words[char] = 1
+
+print(list_words)
+
 ==================================================
 
+## FUNCTIONS --
+
+Global Variable Inside Function - Modification 
+Read global variable	                   ✅ Allowed without global keyword
+Assign to global variable	               ❌ Not allowed unless declared with global
+Assign inside function without global	   Python treats it as a new local variable
+
+x = "global"
+def fun():
+    double = x * 2
+    print(double)
+fun() 
+
+--x is defined outside the function, so it's a global variable. Inside fun(), you're readingx, not modifying it.
+Python allows reading global variables inside functions without any special declaration. x * 2 just duplicates the string: "globalglobal"
+
+x = "global"
+
+def fun():
+    x = x * 2
+    print(x)
+
+fun()
+
+You're trying to assign to x inside the function: x = x * 2
+Python treats any variable assigned inside a function as local by default.
+So it thinks you're creating a new local variable x, but then tries to use its value (x * 2) before it's defined.
+Since there's no local x yet, Python throws an UnboundLocalError.
+
+x = "global"
+
+def fun():
+    global x
+    x = x * 2
+    print(x)
+
+fun()
+
+When we declare with global keyword, it creates a local copy of the global variable.
+
+
+
+-----------------------------------------------------------------
 list_nums = [12,12,34,55,67,88,89,85]
 list_rev=[]
 
