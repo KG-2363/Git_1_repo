@@ -1,2 +1,244 @@
 Airflow is an orchestration tool for scheduling tasks.
 It is an open source project developed by Airbnb.
+
+## Bash Operator --
+
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='list_gcs_files_dag',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval='@daily',
+    catchup=False
+) as dag:
+
+    list_gcs_files = BashOperator(
+        task_id='list_gcs_files',
+        bash_command='gsutil ls gs://dataproc_jobs_bucket/'
+    )
+
+## Trigger Dag Run Operator --
+
+from airflow import DAG
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='trigger_dag_example',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval='@daily',
+    catchup=False
+) as dag:
+
+    trigger = TriggerDagRunOperator(
+        task_id='trigger_prod_conditional_dag',
+        trigger_dag_id='prod_conditional_branching_dag' 
+    )
+    trigger = TriggerDagRunOperator(
+        task_id='trigger_list_gcs_files_dag',
+        trigger_dag_id='list_gcs_files_dag' 
+    )
+
+## Sensor operator --
+
+
+from airflow import DAG
+from airflow.sensors.filesystem import FileSensor
+from airflow.operators.dummy import DummyOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='file_sensor_dag',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval='@daily',
+    catchup=False
+) as dag:
+
+    wait_for_file = FileSensor(
+        task_id='wait_for_file',
+        filepath='gs://sensing_files',
+        poke_interval=10,
+        timeout=60
+    )
+
+    proceed = DummyOperator(task_id='proceed')
+
+    wait_for_file >> proceed
+
+
+## Email Operator 
+
+from airflow import DAG
+from airflow.operators.email import EmailOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='email_notification_dag',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval='@daily',
+    catchup=False
+) as dag:
+
+    send_email = EmailOperator(
+        task_id='send_email',
+        to='kumargovind2363@gmail.com',
+        subject='Airflow Task Completed',
+        html_content='<p>Your task has finished successfully!</p>'
+    )
+
+## Branch Operator 
+
+✅ How It Works
+# BranchPythonOperator (decide_next_task) returns the task_id of the next task to run.
+# Airflow skips the other tasks not returned by the branch.
+# DummyOperator (end) is used to gracefully end the DAG.
+
+
+from airflow import DAG
+from airflow.operators.python import PythonOperator, BranchPythonOperator
+from airflow.operators.dummy import DummyOperator
+from datetime import datetime
+
+def extract_data():
+    print("Extracting data...")
+
+def validate_data():
+    print("Validating data...")
+
+def decide_next_task():
+    # Simulate validation result
+    is_valid = True  # Change to False to test the other path
+    if is_valid:
+        return 'load_data'
+    else:
+        return 'send_alert'
+
+def load_data():
+    print("Loading data into database...")
+
+def send_alert():
+    print("Sending alert: Data validation failed.")
+
+with DAG(
+    dag_id='conditional_branching_example',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False
+) as dag:
+
+    task1 = PythonOperator(
+        task_id='extract_data',
+        python_callable=extract_data
+    )
+
+    task2 = PythonOperator(
+        task_id='validate_data',
+        python_callable=validate_data
+    )
+                                              # BranchPythonOperator (decide_next_task) returns the task_id of the next task to run.
+
+    branch_task = BranchPythonOperator(
+        task_id='decide_next_task',
+        python_callable=decide_next_task
+    )
+
+    task3 = PythonOperator(
+        task_id='load_data',
+        python_callable=load_data
+    )
+
+    task4 = PythonOperator(
+        task_id='send_alert',
+        python_callable=send_alert
+    )
+
+    end = DummyOperator(task_id='end')
+
+    # Define dependencies
+    task1 >> task2 >> branch_task
+    branch_task >> task3 >> end
+    branch_task >> task4 >> end
+
+## XCOM Operator --
+
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from datetime import datetime
+
+def start_number(**context):
+   context["ti"].xcom_push(key = 'current_value', value =10)
+   print("Starting number 10")
+
+def add_five(**context):
+   current_value = context["ti"].xcom_pull( key = 'current_value', task_ids = 'start_task')
+   new_value = current_value + 5
+   context["ti"].xcom_push(key = "current_value", value = new_value)
+   print(f" Add 5: {current_value}) + 5 = {new_value} )
+
+def multiply_five(** context):
+   current_value = context["ti"].xcom_pull( Key = 'current_value', task_ids = 'add_five_task')
+   new_value = current_value * 5
+   context["ti"].xcom_pull( key ="current_value", value = new_value)
+   print(f" Multiply 5 : {current_value} * 5 = {new_value})
+
+with DAG( 
+    dag_id = 'math_seq_dag',
+    stu_data = datetime("2023-01-01"),
+    schedule_interval = '@once'
+    catchup = False
+     ) as dag:
+
+    start_task = PythonOperator(
+               task_id = 'start_task', 
+               python_callable = start_number , 
+               provide_context = True)
+
+    add_five_task= PythonOperator(
+               task_id = 'add_five_task', 
+               python_callable = add_five , 
+               provide_context = True)
+
+    multiply_five_task= PythonOperator(
+               task_id = 'multiply_five_task', 
+               python_callable = multiply_five , 
+               provide_context = True)
+
+    start_task >> add_five_task >> multiply_five_task
+
+## Taskflow API 
+
+from airflow import DAG
+from airflow.decorators import task
+from datetime import datetime
+
+with DAG(
+dag_id = "math_seq_dag_with_taskflow",
+start_date = datetime(2023,1,1)
+schedule_interval = '@once'
+catchup = False,
+) as dag:
+
+@task
+def start_number():
+    initial_value = 10
+    print(f"Start number : {start_number}")
+    return initial_value
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
