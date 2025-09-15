@@ -78,7 +78,6 @@ if all(n > 0 for n in numbers):
 
 
 password = "Secure123!"
-
 special_chars = "!@#$%^&*()"
 has_special = any(char in special_chars for char in password)
 has_digit = any(char.isdigit() for char in password)
