@@ -1,5 +1,11 @@
 Python --
 
+When we take input from the console using input function, the default type is string. We need to convert the type if we need to
+use as diff datatype.
+x = input("Enter first number")
+print(type(x)) -- class str
+
+
 Basic functions in Python --
 
 1. Map -- It takes a function and a list as an argument. It returns an iterator, not a list.
