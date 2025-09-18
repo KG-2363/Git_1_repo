@@ -56,8 +56,72 @@ select e.emp_id, e.emp_name, e.manager_id, oc.level + 1 from employees e join Or
 )
 select * from Orgchart order by level, emp_id
 
-# 
+#  Best emp, best client by dept id --
 
+-- create table emp_details( emp_id INT, emp_name VARCHAR, dept_id INT);
+
+--insert into emp_details (emp_id,emp_name,dept_id) 
+--Values
+--(101,'ALice',1),
+--(102,'Bob',1),
+--(103,'Carol',2),
+--(104,'David',2)
+
+--create table emp_sales(emp_id INT, client_id INT, sales INT)
+
+--insert into emp_sales(emp_id,client_id,sales)
+--VALUES
+--(101,201,5000),
+--(101,202,3000),
+--(102,201,7000),
+--(103,202,6000),
+--(104,203,8000)
+
+Emp_details
+emp_id	emp_name	dept_id
+101	ALice	1
+102	Bob	1
+103	Carol	2
+104	David	2
+
+
+Emp_sales
+emp_id	client_id	sales
+101	201	5000
+101	202	3000
+102	201	7000
+103	202	6000
+104	203	8000
+
+
+
+select dept_id, 
+max(case when client_rank = 1 then client_id else 0 end) as best_client_id,
+max(case when emp_rank = 1 then emp_id else 0 end) as best_emp_id
+from 
+(
+with max_emp_sales as ( 
+  select emp_id,sum(sales) as sales from emp_sales group by emp_id),
+max_client_sales as (
+  select client_id,sum(sales) as sales from emp_sales group by client_id)
+
+select d.dept_id,d.emp_id,s.client_id ,m.sales client_sales ,e.sales emp_sales,
+dense_rank() over (partition by d.dept_id order by m.sales desc) as client_rank,
+dense_rank() over (partition by d.dept_id order by e.sales desc) as emp_rank
+from emp_details d
+join emp_sales s
+on d.emp_id = s.emp_id
+join max_emp_sales e
+on e.emp_id = s.emp_id
+join max_client_sales m
+on s.client_id = m.client_id
+)
+group by dept_id
+
+# Output
+dept_id	best_client_id	best_emp_id
+1	201	101
+2	202	104
 
 
 
