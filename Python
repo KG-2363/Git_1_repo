@@ -338,6 +338,34 @@ When we declare with global keyword, it creates a local copy of the global varia
 
 
 -----------------------------------------------------------------
+ERROR AND EXCEPTION HANDLING --
+
+
+
+
+
+# Custom exception --
+The custom exception must extend the base exception class. 
+
+class WrongEmailError(Exception):
+    pass
+
+try: 
+   email = input("Enter the mail id: ")
+   if '@' not in email:
+       raise WrongEmailError("Please enter a valid mail id")
+   
+except WrongEmailError as e:
+    print(e)
+    
+else:
+    print("Your email id is: ",email)
+
+finally:
+    print("final thing ")
+
+
+----------------------------------------------------------------------
 list_nums = [12,12,34,55,67,88,89,85]
 list_rev=[]
 
