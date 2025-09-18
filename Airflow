@@ -302,7 +302,128 @@ def start_number():
     return initial_value
 
 
+## Dag simulation with threading --
   
+import os
+import time
+import json
+import threading
+import logging
+from datetime import datetime, timedelta
+
+# Setup logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
+
+# Load configuration from JSON file
+with open('dag_config.json', 'r') as f:
+    config = json.load(f)
+
+# DAG class definition
+class DAG:
+    def __init__(self, dag_id, start_date, schedule_interval, catchup):
+        self.dag_id = dag_id
+        self.start_date = datetime.strptime(start_date, "%Y-%m-%d")
+        self.schedule_interval = schedule_interval
+        self.catchup = catchup
+        self.tasks = []
+
+    def __enter__(self):
+        logging.info(f"[DAG INIT] DAG '{self.dag_id}' initialized.")
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        logging.info(f"[DAG END] DAG '{self.dag_id}' finalized.")
+
+    def add_task(self, task_func):
+        self.tasks.append(task_func)
+
+    def run(self):
+        current_date = self.start_date
+        today = datetime.now().date()
+
+        while current_date.date() <= today:
+            logging.info(f"[RUN] Executing DAG for date: {current_date.date()}")
+            for task in self.tasks:
+                try:
+                    task()
+                except Exception as e:
+                    logging.error(f"[ERROR] Task failed: {e}")
+            current_date += timedelta(days=1)
+            if not self.catchup:
+                break
+
+# Simulated FileSensor with retries
+def file_sensor(filepath, poke_interval=5, timeout=30, retries=3):
+    def sensor_task():
+        logging.info(f"[Sensor] Checking for file: {filepath}")
+        attempt = 0
+        while attempt < retries:
+            waited = 0
+            while waited < timeout:
+                if os.path.exists(filepath):
+                    logging.info(f"[Sensor] File found: {filepath}")
+                    return True
+                logging.info(f"[Sensor] File not found. Retrying in {poke_interval}s...")
+                time.sleep(poke_interval)
+                waited += poke_interval
+            attempt += 1
+            logging.warning(f"[Sensor] Retry {attempt}/{retries} failed.")
+        logging.error(f"[Sensor] File not found after {retries} retries.")
+        return False
+    return sensor_task
+
+# Simulated task functions
+def read_file():
+    logging.info("[Task] Reading the file...")
+
+def transform_data():
+    logging.info("[Task] Transforming data...")
+
+def load_to_db():
+    logging.info("[Task] Loading data to DB...")
+
+# Task factory
+def create_task(task_name):
+    task_map = {
+        "read_file": read_file,
+        "transform_data": transform_data,
+        "load_to_db": load_to_db
+    }
+    return task_map.get(task_name, lambda: logging.warning(f"[Task] Unknown task: {task_name}"))
+
+# Task pipeline with parallel execution
+def task_pipeline():
+    sensor_config = config['file_sensor']
+    sensor = file_sensor(
+        filepath=sensor_config['filepath'],
+        poke_interval=sensor_config['poke_interval'],
+        timeout=sensor_config['timeout'],
+        retries=sensor_config['retries']
+    )
+
+    if sensor():
+        threads = []
+        for task_name in config['tasks']:
+            task = create_task(task_name)
+            thread = threading.Thread(target=task)
+            threads.append(thread)
+            thread.start()
+
+        for thread in threads:
+            thread.join()
+    else:
+        logging.warning("[Pipeline] Skipping pipeline due to missing file.")
+
+# Create and run the DAG using config
+dag_config = config['dag']
+with DAG(
+    dag_id=dag_config['dag_id'],
+    start_date=dag_config['start_date'],
+    schedule_interval=dag_config['schedule_interval'],
+    catchup=dag_config['catchup']
+) as dag:
+    dag.add_task(task_pipeline)
+    dag.run()
 
 
 
