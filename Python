@@ -340,9 +340,19 @@ When we declare with global keyword, it creates a local copy of the global varia
 -----------------------------------------------------------------
 ERROR AND EXCEPTION HANDLING --
 
+There are two types of errors in Python 
+1. Syntax error 
+2. Exceptions
 
+Syntax errors occur at compile time.
+Exception occur at run time.
 
+Try - the code which can produce errors.
+Except - it handles the logic for catching the exception or error.
+Else - It executes when the try block doesn't result into error.
+Finally - It runs each time whether an exception occurs or not. It normally has the code for clean up of resources.
 
+# Raise - Python provides a way to raise errors maunally when some conditions are not met.
 
 # Custom exception --
 The custom exception must extend the base exception class. 
@@ -363,6 +373,43 @@ else:
 
 finally:
     print("final thing ")
+
+# Two custom errors --
+# since the exception class already has self and msg arguments, super keyword uses the message from thye base class 
+and overrides the message we have provided ourselves.
+
+class InvalidAgeError(Exception): 
+    def __init__(self,age):
+        self.age = age
+        super().__init__(f"Invalid age. {age} must be a positive integer.")
+
+class InvalidEmailError(Exception): 
+    def __init__(self,email):
+        self.email = email
+        super().__init__(f"Invalid email. {email} must be in the format username@gmail.com")
+
+class Person:
+    def __init__(self,name,age,email):
+        self.name = name
+        
+        #validate age
+        if age < 0:
+            raise InvalidAgeError(age)
+        self.age = age
+        if '@' not in email or '.' not in email:
+            raise InvalidEmailError(email)
+        self.email = email
+
+try:
+    p1= Person("Govind", -29 ,'anksgmail.com')
+except InvalidAgeError as e:
+    print(e)
+except InvalidEmailError as e:
+    print(e)
+else:
+    print("Welcome ")
+    
+
 
 
 ----------------------------------------------------------------------
