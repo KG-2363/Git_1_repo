@@ -94,7 +94,7 @@ emp_id	client_id	sales
 104	203	8000
 
 
-
+# Solution --
 select dept_id, 
 max(case when client_rank = 1 then client_id else 0 end) as best_client_id,
 max(case when emp_rank = 1 then emp_id else 0 end) as best_emp_id
@@ -122,6 +122,45 @@ group by dept_id
 dept_id	best_client_id	best_emp_id
 1	201	101
 2	202	104
+
+-- Use meanigful aliases, single CTE, avoid repeated aggregation, use nulls in place of zeros, row number instead of dense rank,
+# Optimised --
+
+WITH emp_sales_agg AS (
+  SELECT emp_id, client_id, SUM(sales) AS total_sales
+  FROM emp_sales
+  GROUP BY emp_id, client_id
+),
+emp_totals AS (
+  SELECT emp_id, SUM(total_sales) AS emp_sales
+  FROM emp_sales_agg
+  GROUP BY emp_id
+),
+client_totals AS (
+  SELECT client_id, SUM(total_sales) AS client_sales
+  FROM emp_sales_agg
+  GROUP BY client_id
+),
+ranked AS (
+  SELECT 
+    ed.dept_id,
+    ed.emp_id,
+    esa.client_id,
+    ct.client_sales,
+    et.emp_sales,
+    ROW_NUMBER() OVER (PARTITION BY ed.dept_id ORDER BY ct.client_sales DESC) AS client_rank,
+    ROW_NUMBER() OVER (PARTITION BY ed.dept_id ORDER BY et.emp_sales DESC) AS emp_rank
+  FROM emp_details ed
+  JOIN emp_sales_agg esa ON ed.emp_id = esa.emp_id
+  JOIN emp_totals et ON et.emp_id = esa.emp_id
+  JOIN client_totals ct ON ct.client_id = esa.client_id
+)
+SELECT 
+  dept_id,
+  MAX(CASE WHEN client_rank = 1 THEN client_id ELSE NULL END) AS best_client_id,
+  MAX(CASE WHEN emp_rank = 1 THEN emp_id ELSE NULL END) AS best_emp_id
+FROM ranked
+GROUP BY dept_id;
 
 
 
