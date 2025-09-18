@@ -1,6 +1,81 @@
 Airflow is an orchestration tool for scheduling tasks.
 It is an open source project developed by Airbnb.
 
+# Conceptual -- How this Airflow framework implements DAG context in Python( real may differ)--
+from datetime import datetime, timedelta
+
+class DAG:
+    def __init__(self, dag_id, start_date, schedule_interval, catchup):
+        self.dag_id = dag_id
+        self.start_date = start_date
+        self.schedule_interval = schedule_interval
+        self.catchup = catchup
+        self.tasks = []
+
+    def __enter__(self):
+        print(f"Initializing DAG: {self.dag_id}")
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print(f"Finalizing DAG: {self.dag_id}")
+        print(f"Tasks registered: {[task.__name__ for task in self.tasks]}")
+
+    def add_task(self, task_func):
+        self.tasks.append(task_func)
+
+# Simulating a task
+def dummy_task():
+    print("Running dummy task")
+
+# Using the DAG context manager
+with DAG(
+    dag_id='file_sensor_dag',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval='@daily',
+    catchup=False
+) as dag:
+    dag.add_task(dummy_task)
+------------------------------------------------------------
+
+# Simulated FileSensor
+def file_sensor(filepath, poke_interval=5, timeout=30):
+    def sensor_task():
+        print(f"[Sensor] Checking for file: {filepath}")
+        waited = 0
+        while waited < timeout:
+            if os.path.exists(filepath):
+                print(f"[Sensor] File found: {filepath}")
+                return True
+            print(f"[Sensor] File not found. Retrying in {poke_interval}s...")
+            waited += poke_interval
+        print(f"[Sensor] Timeout reached. File not found.")
+        return False
+    return sensor_task
+
+# Simulated downstream task
+def process_file():
+    print("[Task] Processing the file...")
+
+# Using the DAG context
+with DAG(
+    dag_id='file_sensor_dag',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval='@daily',
+    catchup=False
+) as dag:
+    sensor = file_sensor('data/input_file.csv')
+    
+    def task_wrapper():
+        if sensor():
+            process_file()
+        else:
+            print("[Task] Skipping file processing due to missing file.")
+
+    dag.add_task(task_wrapper)
+    dag.run()
+
+-----------------------------------------------------------------------
+
 ## Bash Operator --
 
 from airflow import DAG
