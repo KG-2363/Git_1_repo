@@ -121,6 +121,44 @@ print(order1>order2)
 
 ==================================================
 
+## Threading --
+In Python, threading lets your program do multiple things at the same time 
+— like downloading files, processing data, or waiting for a sensor — without blocking other tasks.
+
+To speed up tasks that wait (e.g., file I/O, network calls).
+To keep your app responsive (e.g., GUI or web server).
+To simulate real-world concurrency (like Airflow DAGs).
+
+# basic implementation
+
+import threading
+import time
+
+def greet():
+    for i in range(3):
+        print("Hello!")
+        time.sleep(1)
+
+def farewell():
+    for i in range(3):
+        print("Goodbye!")
+        time.sleep(1)
+
+# Create threads
+t1 = threading.Thread(target=greet)
+t2 = threading.Thread(target=farewell)
+
+# Start threads
+t1.start()
+t2.start()
+
+# Wait for both to finish
+t1.join()
+t2.join()
+
+print("Done!")
+------------------------------------------------------------
+
 class Node:
     def __init__(self, data = None, next = None):
         self.data = data
