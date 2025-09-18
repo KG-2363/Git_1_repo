@@ -163,4 +163,21 @@ FROM ranked
 GROUP BY dept_id;
 
 
+Questions --
+Question: For each department, find the top 3 employees based on total sales. Include their rank and total sales.
+Question: Assign percentile ranks to employees based on their total sales across all departments.
+Question: Find the client who has made purchases in the most number of distinct months. Return client ID and count of months.
+Question: For each employee, calculate their percentage contribution to the total sales of their department.
+Question: For each employee, find the date of their first and last sale.
+Question: For each employee, calculate a 3-month rolling sum of sales.
+Question: Identify employees whose sales in any month were more than 2x their average monthly sales.
+Question: Find clients who made purchases in consecutive months at least 3 times.
+Question: For each department, find:
+  Total sales
+  Number of employees
+  Average sales per employee
+  Best performing employee
+Question: Suppose you have stages like lead, contacted, demo, closed. For each stage, 
+          count how many clients reached it and calculate conversion rate to the next stage.
+
 
