@@ -34,7 +34,7 @@ b= reduce(lambda x,y : x*y,list1)
 print(b) --24
 print(type(b)) --class int
 
-4. Filter --The filter() function in Python takes in a function and a list as arguments. 
+4. Filter --The filter() function in Python takes in a function and a list as arguments. Returns a list
 This offers an elegant way to filter out all the elements of a sequence "sequence", for which the function returns True.
 a = [1,2,3,4,5]
 even = filter(lambda x : x%2 ==0, a)
@@ -136,8 +136,52 @@ for i, fruit in enumerate(fruits):
 
 for i in range(len(fruits)):
     print(f"Index {i}: {fruits[i]}")
+
+
+# pop() method ---------------------
+
+Purpose: Removes an element by index and returns it.
+Syntax: list.pop(index)
+Default behavior: If no index is provided, it removes and returns the last element.
+Raises: IndexError if the index is out of range.
+
+✅ Use cases:
+
+When you need to extract and use an element from a specific position.
+Useful in stack or queue implementations.
+
+nums = [10, 20, 30, 40]
+removed = nums.pop(2)  # Removes 30
+print(removed)         # Output: 30
+print(nums)            # Output: [10, 20, 40]
+
+
+# remove() method --------------------
+
+Purpose: Removes the first occurrence of a specific value.
+Syntax: list.remove(value)
+Raises: ValueError if the value is not found.
+
+✅ Use cases:
+
+When you know the value to remove but not its index.
+Useful for cleaning up duplicates or removing specific items.
+
+nums = [10, 20, 30, 20, 40]
+nums.remove(20)        # Removes the first 20
+print(nums)            # Output: [10, 30, 20, 40]
+
+
+Feature              pop()                 remove()
+Removes by           Index                 Value
+Returns value?       ✅ Yes               ❌ No
+Raises error         IndexError            ValueError
+Use case             Extract by position   Delete by value
+
+
 -------------------------------------------------
-Move all zeros in a list to the end while maintaining the order of non-zero elements. 
+# Move all zeros in a list to the end while maintaining the order of non-zero elements. 
+
 [0, 1, 0, 3, 12] to [1, 3, 12, 0, 0]
 
 list_nums = [0, 1, 0, 3, 12]
@@ -151,11 +195,18 @@ for num in list_nums:
 for i in range(count):
     new_list_nums.append(0)
 print(new_list_nums)
--------------------------------------------------
+
+# Using List Comprehension  ----
+[expression for item in iterable if condition]
+
 new_list_nums = [num for num in list_nums if num != 0]
 new_list_nums += [0] * list_nums.count(0)
 print(new_list_nums)
+
 --------------------------------------------------
+# Return True if the list is sorted USING FLAG
+-- We are using break to come out of the for loop when the condition is met
+
 nums = [1, 6, 3, 2, 9]
 is_sorted = True
 for i in range(1, len(nums)):
@@ -163,6 +214,16 @@ for i in range(1, len(nums)):
         is_sorted = False
         break
 print(is_sorted)
+
+---------------------------
+is sorted = True
+for i in range(1, len(nums)):
+     if nums[i-1] >= nums[i]:
+         is_sorted = False
+         break
+print(is_sorted)
+
+-----------------------------
 ==================================================
 ## TUPLES -A tuple is an immutable, ordered collection of elements in Python. You define it using parentheses ().
 Tuples use less memory than lists and are slightly faster for iteration.
@@ -218,6 +279,8 @@ clear()	                      Removes all items	                                
 setdefault(key, default)	  Sets value if key not present                  	employee.setdefault("team", "Data")
 copy()	                      Returns a shallow copy	                        new_emp = employee.copy()
 
+# Basic Operations on Dictionary --
+
 students = [
     {'name': 'Ravi', 'marks': 85},
     {'name': 'Anita', 'marks': 92},
@@ -227,7 +290,7 @@ students = [
 names = []
 count = 0
 
-# get method
+# get method --
 
 for student in students:
     if student.get('marks') > 80:
@@ -236,17 +299,29 @@ for student in students:
 print(set(names))
 print(count)
 
-# Items method 
+# Items method --
+--Returns a list of dict items having key and value pair as tuples
 
 student1 = {'name': 'Ravi', 'age': 21, 'grade': 'A'}
-student1_list = student1.items()
+
+student1_list = student1.items() --prints list of tuples having key and value
 print(student1_list)
+# dict_items([('name', 'Ravi'), ('age', 21), ('grade', 'A')])
+
+# Print elements of dictionary as key : value --
+
 for k,v in student1.items():
     print(f"{ k } : { v }")
+# name : Ravi
+age : 21
+grade : A
 
 # isinstance method -- checks the datatype 
 if isinstance(v, str):
      print(v)
+---------------------------------------------------
+# Accessing elements of nested dictionaries 
+-- Return the address having state as mh from the dict 
 
 cust_details = {
     'name': 'hello',
@@ -261,7 +336,7 @@ cust_details = {
 for addr in cust_details['address']:
     if addr['state'] == 'mh':
         print(addr)
-
+-------------------------------------------------
 # adding two dictionaries
 dict1 = {'Virat': 10, 'Sachin': 20, 'Dhoni': 30}
 dict2 = {'Virat': 15, 'Smritika': 5, 'Dhoni': 25}
@@ -273,6 +348,7 @@ for key,value in dict2.items():
     else:
         result_dict[key]=value
 print(result_dict)
+----------------------------------------------------
 
 # dict(...) converts this list of tuples into a dictionary. But if a key appears multiple times, only the last occurrence is kept.
 word = ['a','e','i','o','u','a','e','i','k']
@@ -280,6 +356,8 @@ list_words = dict(map(lambda x: (x,1), word))
 print(list_words)
 output --{'a': 1, 'e': 1, 'i': 1, 'o': 1, 'u': 1, 'k': 1}
 So 'a' appears twice, but only the last ('a', 1) is retained. Same for 'e' and 'i'.
+
+-----------------------------------------------------
 
 # Counting the frequency of words in a list and return a dict with word,count --
 word = ['a','e','i','o','u','a','e','i','k']
@@ -295,7 +373,7 @@ print(list_words)
 
 ==================================================
 
-## FUNCTIONS --
+## FUNCTIONS Scope Local and Global --
 
 Global Variable Inside Function - Modification 
 Read global variable	                   ✅ Allowed without global keyword
@@ -334,8 +412,6 @@ def fun():
 fun()
 
 When we declare with global keyword, it creates a local copy of the global variable.
-
-
 
 -----------------------------------------------------------------
 ERROR AND EXCEPTION HANDLING --
@@ -413,19 +489,28 @@ else:
 
 
 ----------------------------------------------------------------------
+## Reverse the list ( Using a third Variable )
+
 list_nums = [12,12,34,55,67,88,89,85]
 list_rev=[]
 
 # Reverse List elements
+
+-- Loop
+
 def rev_list(nums):
     for i in range(len(nums)):
         list_rev.append(nums[-i])
 rev_list(list_nums)
 print(list_rev)
 
+-- Slicing 
+
 def rev_list(nums):
   return nums[::-1]
 print(rev_list(list_nums))
+
+## Sum of even numbers in a list
 
 def even_sum(nums):
     even_nums=[]
@@ -437,6 +522,8 @@ def even_sum(nums):
 
 even_sum(list_nums)
 
+-- list comprehension usng lambda 
+
 even_sum = lambda nums: sum(num for num in nums if num % 2 == 0)
 even_sum(list_nums)
 
@@ -444,17 +531,76 @@ len_list = len(list_nums_1)
 
 ==================================================
 # Remove duplicates from a list
-def remove_dup(nums):
-    i=0
-    while i < len_list-1:
-        if list_nums[i]==list_nums[i+1]:
-            list_nums.remove(list_nums[i+1])
-        else:
-            i+=1
-    return list_nums
 
-remove_dup(list_nums)
+-- Using set 
+
+my_list = [1, 2, 2, 3, 4, 4, 5]
+unique_list = list(set(my_list))
+print(unique_list)
+
+-- Using a loop (order preserved) (Unsorted & sorted )
+
+my_list = [1, 2, 2, 3, 4, 4, 5]
+unique_list = []
+for item in my_list:
+    if item not in unique_list:
+        unique_list.append(item)
+print(unique_list)
+
+-- same list using count function & remove item 
+
+nums =[1,1,2,3,3,34,4,4]
+for num in nums:
+    if nums.count(num)!= 1:
+        nums.remove(num)
+print(nums) 
+
+-- Using a loop using pop (Works only for Sorted) 
+-- beacuse we are comparing adjacent elements
+
+def remove_dup(nums):
+    i = 0
+    while i < len(nums) - 1:
+        if nums[i] == nums[i + 1]:
+            nums.pop(i + 1)
+        else:
+            i += 1
+    return nums
+
+# Example usage
+list_nums = [1, 2, 2, 3, 4, 4, 5]
+print(remove_dup(list_nums))
+
+-- Using dict.fromkeys() (order preserved, Python 3.7+)
+
+my_list = [1, 2, 2, 3, 4, 4, 5]
+unique_list = list(dict.fromkeys(my_list))
+print(unique_list)
+
+-- Using for loop but for is for iteration, manually incrementing values though
+
+def remove_dup(nums):
+    i = 0
+    for _ in range(len(nums)):
+        if i < len(nums) - 1:
+            if nums[i] == nums[i + 1]:
+                nums.pop(i + 1)
+            else:
+                i += 1
+    return nums
+
+-- Using recursion
+
+def remove_dup_recursive(nums):
+    if len(nums) < 2:
+        return nums
+    if nums[0] == nums[1]:
+        return remove_dup_recursive(nums[1:])
+    else:
+        return [nums[0]] + remove_dup_recursive(nums[1:])
+
 ==================================================
+## Square the elements of the list
 
 def squared_nums(nums):
     squared_nums=[]
@@ -463,10 +609,21 @@ def squared_nums(nums):
     return squared_nums
 squared_nums(list_nums_1)
 
+
+nums = [1,2,3,34,4,4]
+sq_nums = [num**2 for num in nums]
+print(sq_nums)
+
+
 ==================================================
+
+## Rotate elements of the list by kth index --
+
 list_1 = [1,2,3,4,5,6,7,8,9,10]
 k=2
+
 # Break the list in 2 parts at kth elements from last and then merge the list
+
 def rotate_list(nums,k):
     list1 = nums[:len(nums)-k]
     list2 = nums[len(nums)-k:]
@@ -479,8 +636,10 @@ def rotate_list(nums,k):
 rotate_list(list_1,k)
 
 ==================================================
+## STRING Manipulation 
 
-#Count the number of vowels in a given string.
+# Count the number of vowels in a given string.
+
 word = 'AnkitaRiya'
 def count_vowels(word):
     vowels = ['a','e','i','o','u','A','E','I','O','U']
@@ -491,9 +650,32 @@ def count_vowels(word):
     return count
 count_vowels(word)
 
-==================================================
+-- Using list comprehension and sum 
 
-#Reverse the string without using slicing.
+def count_vowels(word):
+    vowels = ['a','e','i','o','u','A','E','I','O','U']
+    count = 0
+    count = sum(1 for char in word if char in vowels)
+    return count
+
+
+==================================================
+# Reverse the string using slicing.
+
+def rev_word(word):
+   return word[::-1]
+
+# Reverse the string without using slicing.
+-- adding the ierable in the beginning of the new word adds the last element to the first
+
+word = 'AnkitaRiya'
+rev_word = ""
+for char in word:
+  rev_word = char + rev_word
+   
+print(rev_word)
+
+
 word = 'AnkitaRiya'
 def reverse_string(word1,word2):
     reversed_string=""
@@ -508,7 +690,8 @@ reverse_string(word,word)
 
 ==================================================
 
-#Write a function to find the first non-repeating character in a string. If all characters repeat, return None.
+# Write a function to find the first non-repeating character in a string. If all characters repeat, return None.
+
 def first_non_repeating_character(string):
     repeat_char=[]
     non_repeat_char=[]
@@ -527,6 +710,7 @@ first_non_repeating_character(word)
 
 
 ========================================================================================================================================================================================================
+## Merging two dictionaries if key matches and as it is if doesn't match
 
 dict1 = { 'key1' : 2000, 'key2' : 3000, 'key3' : 5000}
 dict2 = { 'key1' : 1000, 'key2' : 2000}
