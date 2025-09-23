@@ -203,7 +203,8 @@ new_list_nums = [num for num in list_nums if num != 0]
 new_list_nums += [0] * list_nums.count(0)
 print(new_list_nums)
 
---------------------------------------------------
+===============================================================
+## Sorted array
 # Return True if the list is sorted USING FLAG
 -- We are using break to come out of the for loop when the condition is met
 
@@ -224,6 +225,15 @@ for i in range(1, len(nums)):
 print(is_sorted)
 
 -----------------------------
+--Using Recursion 
+In the recursive step we are removing the first element and passing the new list/Array to the function.
+
+def isArraySorted(A):
+    if len(A)==1:
+        return True
+    return A[0] <= A[1] and isArraySorted(A[1:])
+
+
 ==================================================
 ## TUPLES -A tuple is an immutable, ordered collection of elements in Python. You define it using parentheses ().
 Tuples use less memory than lists and are slightly faster for iteration.
