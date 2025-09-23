@@ -778,9 +778,25 @@ result = reduce(
 print(list(result.items()))
 
 ---------------------------------------------------------------
+# Factorial of a number --
+-- Using Iteration
+def factorial(n):
+    fact = 1
+    while n >0:
+        fact= fact * n
+        n= n-1
+    print(fact)
 
+--Using Recursion 
+def factorial(n):
+    if n == 0:
+        return 1
+    else:
+        return n * factorial(n-1)
+    
+print(factorial(5))
 
-
+------------------------------------------------------------------
 
 
 
