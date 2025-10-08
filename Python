@@ -5,6 +5,24 @@ use as diff datatype.
 x = input("Enter first number")
 print(type(x)) -- class str
 
+-- replace function in python 
+str1 = "my name is govind"
+new_str1 = str1.replace(" ","_")
+
+cols_list = df.columns -- returns a list of columns in df, not a function
+new_cols_list = []
+for col in cols:
+  new_col = col.replace(" ","_").lower()
+  new_cols_list.append(new_col)
+print(new_cols)
+
+-- In Pyspark 
+cols = df.columns
+for col in cols:
+  new_col = col.replace(" ","_").lower()
+  df = df.withColumnRenamed(col,new_col)
+
+
 
 Basic functions in Python --
 
