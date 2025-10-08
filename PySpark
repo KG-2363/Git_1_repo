@@ -184,6 +184,15 @@ word_pairs = words.map(lambda word: (word, 1))
 # Step 3: Reduce by key (word) to count occurrences
 word_counts = word_pairs.reduceByKey(lambda a, b: a + b)
 
+
+-----------------------------------------------------------------
+
+-- In Pyspark update col names with spaces to _
+cols = df.columns
+for col in cols:
+  new_col = col.replace(" ","_").lower()
+  df = df.withColumnRenamed(col,new_col)
+
 # Step 4: Collect the result
 print(word_counts.collect())
 ----------------------------------------------------------------
