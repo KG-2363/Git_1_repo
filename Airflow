@@ -94,6 +94,7 @@ with DAG(
         bash_command='gsutil ls gs://dataproc_jobs_bucket/'
     )
 
+------------------------------------------------------------------------
 ## Trigger Dag Run Operator --
 
 from airflow import DAG
@@ -116,6 +117,7 @@ with DAG(
         trigger_dag_id='list_gcs_files_dag' 
     )
 
+----------------------------------------------------------------------------
 ## Sensor operator --
 
 
@@ -142,7 +144,7 @@ with DAG(
 
     wait_for_file >> proceed
 
-
+----------------------------------------------------------
 ## Email Operator 
 
 from airflow import DAG
@@ -163,6 +165,7 @@ with DAG(
         html_content='<p>Your task has finished successfully!</p>'
     )
 
+-----------------------------------------------------------------------------------
 ## Branch Operator 
 
 ✅ How It Works
@@ -236,6 +239,7 @@ with DAG(
     branch_task >> task3 >> end
     branch_task >> task4 >> end
 
+-------------------------------------------------------------------
 ## XCOM Operator --
 
 from airflow import DAG
@@ -282,6 +286,7 @@ with DAG(
 
     start_task >> add_five_task >> multiply_five_task
 
+--------------------------------------------------------------------
 ## Taskflow API 
 
 from airflow import DAG
@@ -301,7 +306,7 @@ def start_number():
     print(f"Start number : {start_number}")
     return initial_value
 
-
+----------------------------------------------------------------
 ## Dag simulation with threading --
   
 import os
