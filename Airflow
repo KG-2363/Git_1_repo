@@ -4,6 +4,26 @@ It is an open source project developed by Airbnb.
 # Conceptual -- How this Airflow framework implements DAG context in Python( real may differ)--
 from datetime import datetime, timedelta
 
+An Operator is conceptually a template for a predefined Task, that you can just define declaratively inside your Dag:
+
+BashOperator - executes a bash command
+PythonOperator - calls an arbitrary Python function
+EmailOperator
+HttpOperator
+SQLExecuteQueryOperator
+DockerOperator
+HiveOperator
+S3FileTransformOperator
+PrestoToMySqlOperator
+SlackAPIOperator
+
+Use the @task decorator to execute an arbitrary Python function. It doesn’t support rendering jinja templates passed as arguments.
+The @task decorator is recommended over the classic PythonOperator to execute Python callables with no template rendering in its arguments.
+
+
+
+---------------------------------------------------------------------------------------------
+
 class DAG:
     def __init__(self, dag_id, start_date, schedule_interval, catchup):
         self.dag_id = dag_id
