@@ -195,6 +195,44 @@ Removes by           Index                 Value
 Returns value?       ✅ Yes               ❌ No
 Raises error         IndexError            ValueError
 Use case             Extract by position   Delete by value
+--------------------------------------------
+
+
+🔹 list.extend(iterable)
+
+Purpose: Adds each element of the iterable to the end of the list.
+Modifies original list: ✅ Yes
+Returns: None
+Example:
+a = [1, 2]
+b = [3, 4]
+a.extend(b)
+print(a)  # [1, 2, 3, 4]
+
+
+🔹 list.append(item)
+
+Purpose: Adds the item as a single element to the end of the list.
+Modifies original list: ✅ Yes
+Returns: None
+Example:
+Pythona = [1, 2]
+b = [3, 4]
+a.append(b)
+print(a)  # [1, 2, [3, 4]]
+
+
+🔹 list1 + list2
+
+Purpose: Concatenates two lists and returns a new list.
+Modifies original list: ❌ No
+Returns: New list
+Example:
+Pythona = [1, 2]
+b = [3, 4]
+c = a + b
+print(c)  # [1, 2, 3, 4]
+print(a)  # [1, 2] — original list unchanged
 
 
 -------------------------------------------------
