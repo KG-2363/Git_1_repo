@@ -476,8 +476,13 @@ def fun():
     print(x)
 
 fun()
+print(x)
+# output --
+globalglobal
+globalglobal
 
 When we declare with global keyword, it creates a local copy of the global variable.
+the outer variable has been modified by the function.
 
 ----------------------------
 🧠 Meaning of nonlocal
