@@ -493,6 +493,11 @@ inner() is a nested function inside outer().
 By declaring nonlocal x, you're telling Python:
 “Don’t treat x as a new local variable inside inner()—instead, use the x from outer().”
 
+🎯 Significance
+Allows modification of outer function variables: Without nonlocal, x inside inner() would be treated as a new local variable, and the outer x would remain unchanged.
+Useful in closures and decorators: It enables inner functions to retain and update state across multiple calls.
+Avoids global scope pollution: Unlike global, nonlocal keeps the variable within the function hierarchy, making the code cleaner and safer.
+
 
 x=10
 
