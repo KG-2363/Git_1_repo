@@ -2,6 +2,98 @@ SQL Concepts --
 
 SQL Operations - FROM > JOIN > WHERE > GROUP BY > HAVING > SELECT > ORDER BY
 
+
+Use case --
+Finding duplicates   -- row number 
+Third highest salary -- dense_rank
+  -- if we use rank we may miss some f the valid records due to hole between ranks
+
+1. ROW_NUMBER()
+Use Case: Assigns a unique sequential number to each row within a partition.
+Best for: When you need unique row identifiers or want to filter duplicates.
+Example: Get the latest record per user.
+
+SELECT * FROM (
+  SELECT *, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_at DESC) AS rn
+  FROM user_activity
+) t
+WHERE rn = 1;
+
+
+📊 Business Intelligence & Reporting
+
+Paginated reports: Assign row numbers to enable pagination in dashboards.
+Deduplication: Identify and keep only the first occurrence of a record based on some criteria.
+Audit trails: Track the sequence of events or changes per entity.
+
+🧮 Data Engineering & ETL
+
+Surrogate key generation: Create unique IDs for staging tables.
+Change Data Capture (CDC): Identify latest record per key in slowly changing dimensions.
+
+🛒 E-commerce & Retail
+
+Latest transaction per user: Identify most recent purchase or cart update.
+Product listing order: Assign display order for products.
+
+🏦 Finance
+
+Transaction tracking: Identify first or last transaction per account.
+Fraud detection: Flag unusual patterns by comparing row sequences.
+
+🏅 2. RANK()
+Use Case: Assigns a rank to rows within a partition, with gaps in ranking when there are ties
+Best for: When you want to preserve ranking gaps for tied values.
+Example: Rank students by score, allowing gaps for ties.
+SELECT student_id, score,
+       RANK() OVER (ORDER BY score DESC) AS rank
+FROM exam_results;
+If two students tie for 1st place, the next rank will be 3 (not 2).
+
+Top-N analysis with ties: Show top 5 performing stores, allowing multiple stores to share the same rank.
+Sales competitions: Rank sales reps where ties matter and gaps are expected.
+
+Data deduplication with priority: Rank duplicate rows based on timestamp or priority column.
+Partitioned ranking: Rank within groups (e.g., per region, per category) during transformations.
+
+Best-selling products: Rank products by sales volume.
+Customer loyalty: Rank customers by lifetime value or frequency.
+
+🧑‍🏫 Education & Exams
+
+Exam results: Rank students by score, allowing for tied ranks.
+Scholarship eligibility: Select top performers with clear rank gaps.
+
+Portfolio performance: Rank assets by ROI.
+Credit scoring: Rank borrowers based on risk metrics.
+
+🥈 3. DENSE_RANK()
+Use Case: Similar to RANK(), but no gaps in ranking for ties.
+Best for: When you want continuous ranking even with ties.
+Example: Rank products by sales, without skipping ranks.
+
+DENSE_RANK()
+
+Tiered segmentation: Group customers into tiers (e.g., Gold, Silver, Bronze) based on purchase volume without gaps.
+Product categorization: Rank products by popularity for recommendation systems.
+
+Grade assignment: Assign grades based on score bands without skipping ranks.
+
+SELECT product_id, total_sales,
+       DENSE_RANK() OVER (ORDER BY total_sales DESC) AS rank
+FROM product_sales;
+
+If two products tie for 1st place, the next rank will be 2.
+
+
+🧠 Summary Table
+
+Function         Gaps in Rank      Unique per Row     Common Use Case
+ROW_NUMBER()     ❌ No✅          Yes                Deduplication, pagination
+RANK()           ✅ Yes           ❌                 NoCompetition-style ranking with gaps
+DENSE_RANK()     ❌ No            ❌                 NoGrouped ranking without gaps
+
+
 # Join with Ranking for top 3 highest salaries in dept --
 WITH ranked_employees as (
 select e.emp_id, e.emp_name, e.dept_id, d.name, e.salary,
