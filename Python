@@ -441,6 +441,28 @@ print(list_words)
 
 ## FUNCTIONS Scope Local and Global --
 
+When we use a variable name, how does Python know where to find its value?
+
+It uses the LEGB rule!
+LEGB stands for Local, Enclosing, Global, Built-in. 
+These are the possible scopes of a variable in Python. When we use a variable name in Python, it follows this sequence to find its value.
+
+In Python, variables are stored in namespaces, which act as containers for mapping names to objects. When Python encounters a variable, it searches through different namespaces to find its value, following the LEGB rule.
+
+L - Local:: Variables defined within the current function.
+
+E - Enclosing: Variables in the local scope of any enclosing functions (for nested functions).
+
+G - Global: Variables defined at the module level (outside any function or class).
+
+B - Built-in: Names pre-defined in Python, such as len() or dict.
+
+Python searches in the order Local → Enclosing → Global → Built-in until it finds the variable. If the variable isn't found, it raises a NameError.
+
+
+
+
+
 Global Variable Inside Function - Modification 
 Read global variable	                   ✅ Allowed without global keyword
 Assign to global variable	               ❌ Not allowed unless declared with global
@@ -540,6 +562,144 @@ inner x: 11
 Outer x: 20
 Global x: 11
 
+
+locals and globals function --
+-- We have defined locals inside outer function scope and globals outside. it shows the contents of the namespace -
+-- inner function and x = 11
+
+CASE 1 ------------------------------------------------------
+
+x=10
+
+def outer():
+  x=20
+  def inner():
+      nonlocal x
+      x=x+1
+      print("inner x:",x)
+
+  inner()
+  print("Outer x:",x)
+  print(locals())
+   
+outer()
+print("Global x:",x)
+
+
+print(globals())
+
+# Output --
+
+inner x: 21
+Outer x: 21
+{'inner': <function outer.<locals>.inner at 0x7894c57182c0>, 'x': 21}
+Global x: 10
+{'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <class '_frozen_importlib.BuiltinImporter'>, '__spec__': None, '__annotations__': {},
+'__builtins__': <module 'builtins' (built-in)>, 
+'traceback': <module 'traceback' from '/usr/local/lib/python3.12/traceback.py'>,
+'x': 10, 'outer': <function outer at 0x7894c5718220>}
+
+
+CASE 2 ------------------------------------------------------------
+
+x=10
+
+def outer():
+  x=20
+  def inner():
+      global x
+      x=x+1
+      print("inner x:",x)
+
+  inner()
+  print("Outer x:",x)
+  print(locals())
+   
+outer()
+print("Global x:",x)
+
+
+print(globals())
+
+# Output --
+
+inner x: 11
+Outer x: 20
+{'x': 20, 'inner': <function outer.<locals>.inner at 0x7e29754d02c0>}
+Global x: 11
+{'__name__': '__main__', '__doc__': None, '__package__': None, '__loader__': <class '_frozen_importlib.BuiltinImporter'>, '__spec__': None, '__annotations__': {},
+'__builtins__': <module 'builtins' (built-in)>, 
+'traceback': <module 'traceback' from '/usr/local/lib/python3.12/traceback.py'>,
+'x': 11, 'outer': <function outer at 0x7e29754d0220>}
+
+
+--
+x=1
+def outer():
+    x = 5
+    def inner():
+        nonlocal x
+        x = 3 
+        print(x)# modifies `x` in the enclosing `outer` function
+    inner()
+    print(x)  # prints 3
+outer()
+print(x)
+
+#output --
+3
+3
+1
+
+x=1
+def outer():
+    x = 5
+    def inner():
+        global x
+        x = 3 
+        print(x)# modifies `x` in the enclosing `outer` function
+    inner()
+    print(x)  # prints 3
+outer()
+print(x)
+
+#output --
+3
+5
+3
+
+
+Actions that create scope in Python:
+
+Calling a function: Each function call creates a new local scope.
+Accessing attributes or functions of a class: Class and instance scopes are created when you access or define functions within them.
+Accessing objects in another module or package: Imported modules reside in the global scope of the importing module but create their own namespace, 
+similar to calling a function.
+
+Actions that DON’T create scope in Python:
+
+Entering an if statement: Variable assignments within an if block affect the current scope.
+Entering a for or while loop: Variables defined within loops also stay in the current scope.
+Creating a context manager (using with statements): These do not create a new scope either.
+
+
+x = 10  # Global scope
+
+def outer():
+    global x
+    x = 100  
+    x_enclosed = 50# Enclosing scope
+    def inner():
+      nonlocal x_enclosed
+      print(f"Inner x: {x_enclosed}")
+    inner()
+
+outer()
+print(f"Global x: {x}")
+
+
+Inner x: 50
+Global x: 100
 -----------------------------------------------------------------
 ERROR AND EXCEPTION HANDLING --
 
