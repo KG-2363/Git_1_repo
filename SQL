@@ -5,6 +5,18 @@ SQL Operations - FROM > JOIN > WHERE > GROUP BY > HAVING > SELECT > ORDER BY
 
 Use case --
 Finding duplicates   -- row number 
+
+WITH ranked_visits AS (
+  SELECT *,
+         ROW_NUMBER() OVER (PARTITION BY user_id, visit_date ORDER BY user_id) AS rnk
+  FROM user_visits
+)
+DELETE FROM user_visits
+WHERE user_id IN (
+  SELECT user_id FROM ranked_visits WHERE rnk > 1
+);
+
+
 Third highest salary -- dense_rank
   -- if we use rank we may miss some f the valid records due to hole between ranks
 
@@ -84,6 +96,71 @@ SELECT product_id, total_sales,
 FROM product_sales;
 
 If two products tie for 1st place, the next rank will be 2.
+
+
+Question Leetcode --
+
+We are given a table called UserVisits which contains logs of the dates that users visited a specific retailer. The table has two columns user_id and visit_date. 
+We have to write an SQL query to find out the largest window of days between each visit and the one right after it (or today if we are considering the last visit)
+for each user_id. We return the result table ordered by user_id.
+
+
+INSERT INTO user_visits(user_id, visit_date)
+VALUES 
+  (1, '2020-11-28'),
+  (1, '2020-10-20'),
+  (1, '2020-12-03'),
+  (2, '2020-10-05'),
+  (2, '2020-12-09'),
+  (3, '2020-11-11');
+
+
+select 
+user_id,
+days_until_next_visit
+from  
+ (
+ select 
+ user_id,
+ days_until_next_visit,
+ dense_rank() over (partition by user_id order by days_until_next_visit desc) as rnk 
+ from 
+   (  SELECT
+    user_id,
+    ROUND(julianday(LEAD(visit_date, 1, '2021-01-01') OVER (PARTITION BY user_id ORDER BY visit_date)) - julianday(visit_date)) AS days_until_next_visit
+    FROM user_visits
+   )
+ ) where rnk=1
+;
+
+user_id	  days_until_next_visit
+1	        39
+2	        65
+3	        51
+
+-- optimised query
+
+
+WITH visit_gaps AS (
+  SELECT
+    user_id,
+    ROUND(julianday(LEAD(visit_date, 1, '2021-01-01') OVER (PARTITION BY user_id ORDER BY visit_date)) - julianday(visit_date)) AS days_until_next_visit
+  FROM user_visits
+),
+max_gaps AS (
+  SELECT 
+    user_id,
+    days_until_next_visit,
+    DENSE_RANK() OVER (PARTITION BY user_id ORDER BY days_until_next_visit DESC) AS rnk
+  FROM visit_gaps
+)
+SELECT 
+  user_id,
+  days_until_next_visit
+FROM max_gaps
+WHERE rnk = 1;
+
+
 
 
 🧠 Summary Table
