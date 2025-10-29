@@ -1,0 +1,199 @@
+Multithreading allows multiple threads (smaller units of a process) to run concurrently. 
+In Python, the threading module is commonly used to handle multithreading.
+---------------------------------------------------------------------
+1. Introduction to Multithreading in Python 
+---------------------------------------------------------------------
+
+import threading
+
+def print_numbers():
+    for i in range(5):
+        print(i)
+
+# Create two threads
+t1 = threading.Thread(target=print_numbers)
+t2 = threading.Thread(target=print_numbers)
+
+# Start both threads
+t1.start()
+t2.start()
+
+# Wait for both threads to finish
+t1.join()
+t2.join()
+
+---------------------------------------
+WITHOUT THREADING 
+----------------------------------------
+import time
+def square_numbers(nums):
+    for num in nums:
+        time.sleep(0.2)
+        print("square: ",num**2)
+        
+def cube_numbers(nums):
+    for num in nums:
+        time.sleep(0.2)
+        print("cube: ",num**3)
+
+# Create two threads
+nums = [1,2,3,4,5,6]
+t= time.time()
+square_numbers(nums)
+cube_numbers(nums)
+print("done in seconds: ", time.time()-t)
+
+# OUTPUT --
+square:  1
+square:  4
+square:  9
+square:  16
+square:  25
+square:  36
+cube:  1
+cube:  8
+cube:  27
+cube:  64
+cube:  125
+cube:  216
+done in seconds:  2.4016215801239014
+
+------------------------------------------------------------
+WITH THREADING 
+------------------------------------------------------------
+import threading
+import time
+def square_numbers(nums):
+    for num in nums:
+        time.sleep(0.2)
+        print("square: ",num**2)
+        
+def cube_numbers(nums):
+    for num in nums:
+        time.sleep(0.2)
+        print("cube: ",num**3)
+
+# Create two threads
+nums = [1,2,3,4,5,6]
+# Here, argument is getting passed as tuple of nums
+t1 = threading.Thread(target=square_numbers, args = (nums,))
+t2 = threading.Thread(target=cube_numbers, args = (nums,))
+t= time.time()
+print(t)
+# Start both threads
+t1.start()
+t2.start()
+
+# Wait for both threads to finish
+t1.join()
+t2.join()
+print("done in seconds: ", time.time()-t)
+
+# Output --
+1761716804.0005457
+square:  1
+cube:  1
+square:  4
+cube:  8
+square:  9
+cube:  27
+square:  16
+cube:  64
+square:  25
+cube:  125
+square:  36
+cube:  216
+done in seconds:  1.2282850742340088
+
+-------------------------------------------------------------
+2. Concurrency Issues:
+-------------------------------------------------------------
+When multiple threads try to access shared resources like a database at the same time, it can lead to:
+
+Race Conditions: Two threads access and modify shared data concurrently, leading to inconsistent or incorrect data.
+Deadlocks: Two or more threads get stuck, each waiting for the other to release a resource.
+Starvation: A thread may never get the chance to execute if resources are continuously taken by other threads.
+To handle these issues, we need synchronization mechanisms like Locks.
+
+import threading
+import time
+lock = threading.Lock()
+balance = 0
+
+def update_balance(amount):
+    global balance
+    
+    lock.acquire()  # Acquire the lock
+    try:
+        # Critical section
+        balance += amount
+    finally:
+        lock.release()  # Release the lock
+
+# Create multiple threads that update the balance
+t1 = threading.Thread(target=update_balance, args=(100,))
+t2 = threading.Thread(target=update_balance, args=(200,))
+
+t1.start()
+t2.start()
+
+
+t1.join()
+t2.join()
+
+print(balance)
+
+
+import threading
+
+# Simulate a database operation
+class Database:
+    def __init__(self):
+        self.data = {}
+        self.lock = threading.Lock()
+
+    def update(self, key, value):
+        self.lock.acquire()
+        try:
+            # Simulate a database write operation
+            self.data[key] = value
+            print(f"Updated {key} to {value}")
+        finally:
+            self.lock.release()
+
+    def read(self, key):
+        self.lock.acquire()
+        try:
+            # Simulate a database read operation
+            return self.data.get(key, None)
+        finally:
+            self.lock.release()
+
+# Database instance
+db = Database()
+
+def db_operations(thread_id):
+    db.update(f"key{thread_id}", f"value{thread_id}")
+    print(f"Thread-{thread_id} read: {db.read(f'key{thread_id}')}")
+
+# Create multiple threads that access the database
+threads = []
+for i in range(3):
+    t = threading.Thread(target=db_operations, args=(i,))
+    threads.append(t)
+    t.start()
+
+for t in threads:
+    t.join()
+
+# Output --
+Updated key0 to value0
+Thread-0 read: value0
+Updated key1 to value1
+Updated key2 to value2
+Thread-1 read: value1
+Thread-2 read: value2
+
+
+
+
