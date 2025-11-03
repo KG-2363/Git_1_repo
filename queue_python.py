@@ -121,7 +121,9 @@ Ideal for multi-threaded applications like web crawlers, task schedulers, or pro
 -------------------------------------------------------
 Multiprocessing using a shared variable queue
 -------------------------------------------------------
-
+A queue is used to share the data between processes
+python queue 
+multiprocessing queue is diff.
  
 import multiprocessing
 import time
