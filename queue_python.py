@@ -118,6 +118,28 @@ Ideal for multi-threaded applications like web crawlers, task schedulers, or pro
 
 
 
+-------------------------------------------------------
+Multiprocessing using a shared variable queue
+-------------------------------------------------------
+
+ 
+import multiprocessing
+import time
+
+def calc_sq_nums(nums,q):
+    for n in nums:
+        q.put(n*n)
+    
+if __name__ == "__main__":
+    nums = [ 2,4,5]
+    q = multiprocessing.Queue()
+    p = multiprocessing.Process(target = calc_sq_nums, args=(nums,q))
+    p.start()
+    p.join()
+    while q.empty() is False:
+        print(q.get())
+
+
 
 
 
