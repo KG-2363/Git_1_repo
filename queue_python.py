@@ -140,6 +140,65 @@ if __name__ == "__main__":
     p.join()
     while q.empty() is False:
         print(q.get())
+--------------------------------------------------------------------
+import queue
+q = queue.Queue()
+
+q.put(0,133)
+q.put(1,135)
+q.put(2,373)
+print(q.get())
+print(q.get())
+print(q.get())
+
+0
+1
+2
+
+List as Queue in Python ---
+list1=[]
+
+list1.insert(0,12)
+list1.insert(0,126)
+list1.insert(0,1273)
+print(list1)
+
+list1.pop()
+print(list1)
+list1.pop()
+print(list1)
+list1.pop()
+print(list1)
+
+But issue in case of dynamic array, list index out of index error.
+pop from empty list
+
+
+----------------------------------------------------------------------
+Implementing Deque as Queue --
+
+
+from collections import deque
+
+q= deque()
+q.appendleft(5)
+q.appendleft(9)
+
+print(q)
+q.pop()
+print(q)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
