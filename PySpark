@@ -184,7 +184,46 @@ word_pairs = words.map(lambda word: (word, 1))
 
 # Step 3: Reduce by key (word) to count occurrences
 word_counts = word_pairs.reduceByKey(lambda a, b: a + b)
+--------------------------------------------------------------
 
+You have an employee dataset with columns:
+employee_id, name, salary, department.
+Write a PySpark query to find the top 3 highest salaries in each department.
+
+
+
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, row_number
+from pyspark.sql.window import Window
+
+# Initialize Spark
+spark = SparkSession.builder.appName("Top3Salaries").getOrCreate()
+
+# Sample Data
+data = [
+    (1, "Alice", 90000, "IT"),
+    (2, "Bob", 85000, "IT"),
+    (3, "Charlie", 95000, "IT"),
+    (4, "David", 70000, "HR"),
+    (5, "Eva", 75000, "HR"),
+    (6, "Frank", 80000, "HR"),
+    (7, "Grace", 65000, "Finance"),
+    (8, "Hank", 72000, "Finance"),
+    (9, "Ivy", 71000, "Finance")
+]
+
+columns = ["employee_id", "name", "salary", "department"]
+df = spark.createDataFrame(data, columns)
+
+# Define Window
+windowSpec = Window.partitionBy("department").orderBy(col("salary").desc())
+
+# Apply row_number and filter top 3
+result = df.withColumn("rank", row_number().over(windowSpec)) \
+           .filter(col("rank") <= 3) \
+           .orderBy("department", "rank")
+
+result.show()
 
 -----------------------------------------------------------------
 Read a csv file from S3 Given a df having spaces in columns, can you transform it to have '_' instead of spaces and write to a table in database.
