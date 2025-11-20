@@ -168,6 +168,7 @@ df.select(collect_set("salary")).show(truncate=False)
 +------------------------------------+
 
 ----------------------------------------------------------------
+Can you write a word count program in pyspark from this line in text File.
 from pyspark import SparkContext
 
 sc = SparkContext()
@@ -186,6 +187,7 @@ word_counts = word_pairs.reduceByKey(lambda a, b: a + b)
 
 
 -----------------------------------------------------------------
+Read a csv file from S3 Given a df having spaces in columns, can you transform it to have '_' instead of spaces and write to a table in database.
 
 -- In Pyspark update col names with spaces to _
 cols = df.columns
