@@ -1,0 +1,402 @@
+Concepts & Structure
+
+Node: stores data and a pointer/reference to next (and optionally prev).
+Head: the first node in the list.
+Tail: the last node (next = None for singly linked lists).
+Length: optional to store; useful for O(1) size querying.
+
+Let’s start with a Singly Linked List.
+
+
+
+from dataclasses import dataclass
+from typing import Any, Optional, Iterable
+
+@dataclass
+class Node:
+    data: Any
+    next: Optional['Node'] = None
+
+class SinglyLinkedList:
+    def __init__(self, values: Optional[Iterable[Any]] = None):
+        self.head: Optional[Node] = None
+        self.tail: Optional[Node] = None
+        self._size = 0
+        if values:
+            for v in values:
+                self.append(v)
+
+    def __len__(self):
+        return self._size
+
+    def is_empty(self) -> bool:
+        return self.head is None
+
+    def append(self, value: Any) -> None:
+        """Insert at the end: O(1) with tail pointer."""
+        new_node = Node(value)
+        if self.tail is None:  # list empty
+            self.head = self.tail = new_node
+        else:
+            self.tail.next = new_node
+            self.tail = new_node
+        self._size += 1
+
+    def prepend(self, value: Any) -> None:
+        """Insert at the beginning: O(1)."""
+        new_node = Node(value, next=self.head)
+        self.head = new_node
+        if self.tail is None:
+            self.tail = new_node
+        self._size += 1
+
+    def insert(self, index: int, value: Any) -> None:
+        """Insert at position: O(n) due to traversal."""
+        if index < 0 or index > self._size:
+            raise IndexError("Index out of bounds")
+        if index == 0:
+            self.prepend(value)
+            return
+        if index == self._size:
+            self.append(value)
+            return
+
+        prev = self._node_at(index - 1)
+        new_node = Node(value, next=prev.next)
+        prev.next = new_node
+        self._size += 1
+
+    def _node_at(self, index: int) -> Node:
+        """Return node at index: O(n)."""
+        if index < 0 or index >= self._size:
+            raise IndexError("Index out of bounds")
+        cur = self.head
+        for _ in range(index):
+            cur = cur.next
+        return cur
+
+    def pop_front(self) -> Any:
+        """Remove from front: O(1)."""
+        if self.is_empty():
+            raise IndexError("Pop from empty list")
+        node = self.head
+        self.head = node.next
+        if self.head is None:
+            self.tail = None
+        self._size -= 1
+        return node.data
+
+    def pop_back(self) -> Any:
+        """Remove from end: O(n) unless doubly linked."""
+        if self.is_empty():
+            raise IndexError("Pop from empty list")
+        if self.head == self.tail:
+            data = self.head.data
+            self.head = self.tail = None
+            self._size = 0
+            return data
+        # find penultimate
+        prev = self.head
+        while prev.next != self.tail:
+            prev = prev.next
+        data = self.tail.data
+        prev.next = None
+        self.tail = prev
+        self._size -= 1
+        return data
+
+    def remove(self, value: Any) -> bool:
+        """Remove first occurrence of value: O(n)."""
+        if self.is_empty():
+            return False
+        if self.head.data == value:
+            self.pop_front()
+            return True
+        prev = self.head
+        cur = self.head.next
+        while cur:
+            if cur.data == value:
+                prev.next = cur.next
+                if cur == self.tail:
+                    self.tail = prev
+                self._size -= 1
+                return True
+            prev, cur = cur, cur.next
+        return False
+
+    def find(self, value: Any) -> int:
+        """Return index of value or -1: O(n)."""
+        idx = 0
+        cur = self.head
+        while cur:
+            if cur.data == value:
+                return idx
+            cur = cur.next
+            idx += 1
+        return -1
+
+    def __iter__(self):
+        cur = self.head
+        while cur:
+            yield cur.data
+            cur = cur.next
+
+    def __repr__(self):
+
+
+
+ll = SinglyLinkedList([10, 20, 30])
+ll.append(40)         # [10, 20, 30, 40]
+ll.prepend(5)         # [5, 10, 20, 30, 40]
+ll.insert(2, 15)      # [5, 10, 15, 20, 30, 40]
+print(ll, len(ll))    # SinglyLinkedList([5, 10, 15, 20, 30, 40]) 6
+
+print(ll.find(20))    # 3 (0-based)
+ll.remove(15)         # True, list becomes [5, 10, 20, 30, 40]
+
+print(ll.pop_front()) # 5 -> [10, 20, 30, 40]
+print(ll.pop_back())  # 40 -> [10, 20, 30]
+print(ll)             # SinglyLinkedList([10, 20, 30])
+
+
+
+
+
+
+def reverse_in_place(ll: SinglyLinkedList) -> None:
+    prev = None
+    cur = ll.head
+    ll.tail = ll.head  # after reverse, old head becomes tail
+    while cur:
+        nxt = cur.next
+        cur.next = prev
+        prev = cur
+        cur = nxt
+    ll.head = prev
+
+# Example
+ll = SinglyLinkedList([1, 2, 3, 4])
+reverse_in_place(ll)      # [4, 3, 2, 1]
+print(ll)
+
+
+
+
+
+
+from dataclasses import dataclass
+from typing import Any, Optional, Iterable
+
+@dataclass
+class DNode:
+    data: Any
+    prev: Optional['DNode'] = None
+    next: Optional['DNode'] = None
+
+class DoublyLinkedList:
+    def __init__(self, values: Optional[Iterable[Any]] = None):
+        self.head: Optional[DNode] = None
+        self.tail: Optional[DNode] = None
+        self._size = 0
+        if values:
+            for v in values:
+                self.append(v)
+
+    def __len__(self): return self._size
+    def is_empty(self): return self.head is None
+
+    def append(self, value: Any) -> None:
+        node = DNode(value)
+        if self.tail is None:
+            self.head = self.tail = node
+        else:
+            node.prev = self.tail
+            self.tail.next = node
+            self.tail = node
+        self._size += 1
+
+    def prepend(self, value: Any) -> None:
+        node = DNode(value, next=self.head)
+        if self.head:
+            self.head.prev = node
+        else:
+            self.tail = node
+        self.head = node
+        self._size += 1
+
+    def pop_back(self) -> Any:
+        if self.is_empty():
+            raise IndexError("Pop from empty list")
+        data = self.tail.data
+        self.tail = self.tail.prev
+        if self.tail:
+            self.tail.next = None
+        else:
+            self.head = None
+        self._size -= 1
+        return data
+
+    def pop_front(self) -> Any:
+        if self.is_empty():
+            raise IndexError("Pop from empty list")
+        data = self.head.data
+        self.head = self.head.next
+        if self.head:
+            self.head.prev = None
+        else:
+            self.tail = None
+        self._size -= 1
+        return data
+
+    def __iter__(self):
+        cur = self.head
+        while cur:
+            yield cur.data
+            cur = cur.next
+
+    def __repr__(self):
+        return "DoublyLinkedList([" + ", ".join(repr(x) for x in self) + "])"
+
+
+
+
+
+
+from dataclasses import dataclass
+from typing import Any, Optional, Iterable
+
+@dataclass
+class DNode:
+    data: Any
+    prev: Optional['DNode'] = None
+    next: Optional['DNode'] = None
+
+class DoublyLinkedList:
+    def __init__(self, values: Optional[Iterable[Any]] = None):
+        self.head: Optional[DNode] = None
+        self.tail: Optional[DNode] = None
+        self._size = 0
+        if values:
+            for v in values:
+                self.append(v)
+
+    def __len__(self): return self._size
+    def is_empty(self): return self.head is None
+
+    def append(self, value: Any) -> None:
+        node = DNode(value)
+        if self.tail is None:
+            self.head = self.tail = node
+        else:
+            node.prev = self.tail
+            self.tail.next = node
+            self.tail = node
+        self._size += 1
+
+    def prepend(self, value: Any) -> None:
+        node = DNode(value, next=self.head)
+        if self.head:
+            self.head.prev = node
+        else:
+            self.tail = node
+        self.head = node
+        self._size += 1
+
+    def pop_back(self) -> Any:
+        if self.is_empty():
+            raise IndexError("Pop from empty list")
+        data = self.tail.data
+        self.tail = self.tail.prev
+        if self.tail:
+            self.tail.next = None
+        else:
+            self.head = None
+        self._size -= 1
+        return data
+
+    def pop_front(self) -> Any:
+        if self.is_empty():
+            raise IndexError("Pop from empty list")
+        data = self.head.data
+        self.head = self.head.next
+        if self.head:
+            self.head.prev = None
+        else:
+            self.tail = None
+        self._size -= 1
+        return data
+
+    def __iter__(self):
+        cur = self.head
+        while cur:
+            yield cur.data
+            cur = cur.next
+
+    def __repr__(self):
+        return "DoublyLinkedList([" + ", ".join(repr(x) for x in self) + "])"
+
+
+
+Performance & Python Realities
+
+Python lists are dynamic arrays with O(1) amortized append, O(1) index access, and O(n) insert/delete in the middle due to shifting.
+Linked lists shine where you need frequent insertions/deletions at known positions (e.g., head) with O(1) cost, but:
+
+Traversal is O(n) and they are memory-heavy (per-node overhead).
+Python has a built-in collections.deque, which is a doubly ended queue optimized for O(1) append/pop from both ends—often a better choice for many use cases.
+
+
+
+
+
+def test_singly():
+    ll = SinglyLinkedList()
+    assert ll.is_empty()
+    ll.append(1); ll.append(2); ll.prepend(0)
+    assert list(ll) == [0, 1, 2]
+    ll.insert(2, 1.5)
+    assert list(ll) == [0, 1, 1.5, 2]
+    assert ll.find(1.5) == 2
+    assert ll.remove(1.5) is True
+    assert ll.remove(999) is False
+    assert ll.pop_front() == 0
+    assert ll.pop_back() == 2
+    assert list(ll) == [1]
+    reverse_in_place(ll)  # single-element reverse OK
+    assert list(ll) == [1]
+
+def test_doubly():
+    dl = DoublyLinkedList([10, 20, 30])
+    dl.prepend(5)
+    assert list(dl) == [5, 10, 20, 30]
+    assert dl.pop_back() == 30
+    assert dl.pop_front() == 5
+    assert list(dl) == [10, 20]
+
+test_singly()
+test_doubly()
+
+
+
+
+
+
+
+
+def has_cycle(head: Optional[Node]) -> bool:
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        if slow is fast:
+            return True
+    return False
+
+
+# When to Use What
+
+Use SinglyLinkedList: simple insertions at head, building stacks/queues manually.
+Use DoublyLinkedList: efficient pops from both ends.
+Use CircularLinkedList: round-robin tasks, ring buffers (conceptually).
+
+Use collections.deque: production-ready double-ended queue, highly optimized.
