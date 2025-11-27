@@ -1,0 +1,140 @@
+Problem: Implement SCD Type 2 for Customer Dimension
+Business Case
+You maintain a Customer Dimension that tracks historical changes to customer attributes (e.g., email, city). 
+When a customer’s attribute changes, you must close the current record and insert a new record with updated attributes, 
+preserving history. Use effective dating and an active flag.
+
+Objective
+Given a source staging table with the latest snapshot of customer attributes and a target dimension table that holds 
+historical records, implement SCD Type 2 logic.
+
+Table Schemas
+1) Staging Table: stg_customers (latest snapshot per natural key)
+
+CREATE TABLE stg_customers (
+  customer_id   BIGINT       NOT NULL,  -- natural key
+  name          STRING       NOT NULL,
+  email         STRING       NOT NULL,
+  city          STRING       NOT NULL,
+  snapshot_dt   DATE         NOT NULL   -- snapshot date of the source
+);
+-- Primary/unique key (source-provided): (customer_id)
+
+CREATE TABLE dim_customers (
+  dim_customer_sk  BIGINT       GENERATED ALWAYS AS IDENTITY, -- surrogate key
+  customer_id      BIGINT       NOT NULL,     -- natural key
+  name             STRING       NOT NULL,
+  email            STRING       NOT NULL,
+  city             STRING       NOT NULL,
+  effective_start_dt DATE       NOT NULL,     -- start of validity
+  effective_end_dt   DATE       NOT NULL,     -- end of validity; '9999-12-31' for current
+  is_current         BOOLEAN    NOT NULL      -- current record marker
+);
+-- Natural key + current record uniqueness:
+-- UNIQUE (customer_id, effective_start_dt)
+
+
+INSERT INTO stg_customers (customer_id, name, email, city, snapshot_dt) VALUES
+  (101, 'Asha',  'asha@example.com',  'Bengaluru', DATE '2024-02-15'),
+  (102, 'Rohit', 'rohit@example.com', 'Mumbai',     DATE '2024-02-15'),
+  (103, 'Mira',  'mira@example.com',  'Pune',       DATE '2024-02-15'); -- new customer
+
+
+
+
+INSERT INTO dim_customers
+(customer_id, name, email, city, effective_start_dt, effective_end_dt, is_current)
+VALUES
+  (101, 'Asha',  'asha@example.com', 'Bengaluru', DATE '2023-06-01', DATE '9999-12-31', TRUE),
+  (102, 'Rohit', 'rohit@example.com','Delhi',      DATE '2024-01-01', DATE '9999-12-31', TRUE);
+-- Note: Rohit’s city changed in the staging snapshot (Delhi -> Mumbai), should trigger Type 2 change.
+-- Mira (103) is new, should be inserted as current.
+
+✅ Requirements
+
+No change in attributes → keep existing current record as-is.
+Attribute changed (e.g., city or email) →
+
+Close current record: effective_end_dt = snapshot_dt - 1, is_current = false.
+Insert new record: effective_start_dt = snapshot_dt, effective_end_dt = '9999-12-31', is_current = true.
+
+
+New natural key (not present in target) → insert as current with effective_start_dt = snapshot_dt.
+Optional: Soft delete handling (if a key disappears from snapshot) → leave as-is (common practice), or 
+close current record depending on business rule.
+
+
+
+dim_customer_sk | customer_id | name  | email              | city       | effective_start_dt | effective_end_dt | is_current
+----------------+-------------+-------+--------------------+------------+--------------------+------------------+-----------
+(autogen)       | 101         | Asha  | asha@example.com   | Bengaluru  | 2023-06-01         | 9999-12-31       | TRUE      -- unchanged
+(autogen)       | 102         | Rohit | rohit@example.com  | Delhi      | 2024-01-01         | 2024-02-14       | FALSE     -- closed
+(autogen)       | 102         | Rohit | rohit@example.com  | Mumbai     | 2024-02-15         | 9999-12-31       | TRUE      -- new current
+(autogen)       | 103         | Mira  | mira@example.com   | Pune       | 2024-02-15         | 9999-12-31       | TRUE      -- new insert
+
+
+Use MERGE with two WHEN MATCHED clauses:
+
+First to close current records when any tracked attribute has changed.
+Second as NOOP for unchanged records.
+And a WHEN NOT MATCHED to insert new current rows.
+
+
+
+-- Parameters for run
+-- Assume we run for snapshot_dt = '2024-02-15'
+-- In practice, pass this via a job parameter or notebook widget.
+-- SET snapshot_dt = DATE '2024-02-15';
+
+MERGE INTO dim_customers AS tgt
+USING (
+  SELECT
+    s.customer_id,
+    s.name,
+    s.email,
+    s.city,
+    s.snapshot_dt
+  FROM stg_customers s
+  WHERE s.snapshot_dt = DATE '2024-02-15'
+) AS src
+ON tgt.customer_id = src.customer_id
+AND tgt.is_current = TRUE
+
+-- 1) Close current record if ANY tracked attribute changed
+WHEN MATCHED AND (
+    tgt.name  <> src.name OR
+    tgt.email <> src.email OR
+    tgt.city  <> src.city
+) THEN UPDATE SET
+  tgt.effective_end_dt = DATE '2024-02-15' - INTERVAL 1 DAY,
+  tgt.is_current       = FALSE
+
+-- 2) If matched and nothing changed → NOOP (keep current as-is)
+WHEN MATCHED THEN UPDATE SET
+  tgt.is_current = tgt.is_current  -- no-op
+
+-- 3) Insert new current records FOR keys that are either new OR had changes
+WHEN NOT MATCHED THEN INSERT (
+  customer_id, name, email, city,
+  effective_start_dt, effective_end_dt, is_current
+)
+VALUES (
+  src.customer_id, src.name, src.email, src.city,
+  src.snapshot_dt, DATE '9999-12-31', TRUE
+);
+
+Why it works:
+
+The first MATCHED clause closes the old current row if changed.
+The NOT MATCHED clause then inserts a new current row (either for new keys or changed keys after closing).
+Unchanged rows remain untouched.
+
+
+Performance Notes (Databricks/Delta):
+
+Use OPTIMIZE dim_customers ZORDER BY (customer_id, effective_start_dt) periodically.
+Filter staging to only the run date.
+Consider running in Photon for SQL Warehouses.
+Maintain unique natural key + start date and rely on surrogate key for joins.
+
+
