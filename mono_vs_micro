@@ -1,0 +1,57 @@
+Monolithic --
+
+client -- backend server -- db
+1 lakh servers -- backend server 
+
+
+adv --
+easy to implement
+cost effective 
+diadv --
+no fault tolerance
+
+
+ek server pe kya service de sakte hai? auth server/ search server/ 
+how to decide that?
+how diff services 
+
+
+client -- api gateway -- diff servers --db
+1 lakh users -- divides based on type - search / login / booking 
+load balance ?? 
+fast system
+high uptime
+low latency
+
+
+disadv --
+high cost
+hard to manage
+more developers needed to work on separate services
+
+
+Redis server for seat locking 
+
+no race condition in IRCTC - no seat map - FCFS
+
+
+diff dbs for diff read/write service
+
+cassandra - read optimised
+redis - write optimised
+
+lock L12 and L13 
+crom job that will check whteher lock is expired
+lock kar rahe hai redis me
+
+
+
+cassandra - my sql -- CDC synchronization
+
+
+
+
+
+
+
+
